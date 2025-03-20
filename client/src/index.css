@@ -1,0 +1,710 @@
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+body {
+  font-family: 'Poppins';
+}
+
+/* Register Container */
+
+.registerContainer {
+  margin: 36px 12px;
+
+}
+
+/* Register End */
+
+
+/* ------------------------- */
+
+
+/* Stepper Start */
+
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 42px 0;
+}
+
+.stepperProgress {
+  width: 100%;
+  height: 8px;
+  background: #5ba2fe2f;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stepperFill {
+  height: 100%;
+  background: #5BA2FE;
+  border-radius: 10px;
+}
+
+.stepContainer .steps {
+  display: flex;
+  justify-content: space-between;
+  width: 120%;
+  margin-top: -14px;
+}
+
+.stepContainer .steps .step {
+  text-align: center;
+  flex: 1;
+}
+
+.stepContainer .steps .step-number {
+  border-radius: 24px;
+  background: #5ba2fe2f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 8px 8px;
+  border: 2px solid #5ba2fe2f;
+
+}
+
+.stepContainer .steps .step.active .step-number {
+  background: #5BA2FE;
+  color: white;
+}
+
+.stepContainer .steps .step-label {
+  display: block;
+  font-size: px;
+  margin-top: 5px;
+}
+
+
+/* Stepper End */
+
+/* ------------------------- */
+
+/* Component */
+
+.RegisterComponent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.RegisterComponent h2 {
+  font-size: 20px;
+}
+
+.componentHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #5BA2FE;
+}
+
+.componentHeading h2 {
+  font-size: 20px;
+}
+
+.nameInput {
+  display: flex;
+  gap: 6px;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.nameInput label {
+  font-size: 14px;
+  margin-left: 24px;
+  font-weight: 600;
+  color: #353535;
+}
+
+.nameInput input {
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid #5ba2fe;
+  background: white;
+  font-size: 14px;
+}
+
+.dobSelection {
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.dobSelection label {
+  font-size: 14px;
+  margin-left: 20px;
+  font-weight: 600;
+}
+
+.dobSelection .dobInputs {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+.dobSelection .dobInputs select {
+  padding: 16px 24px;
+  border: 1px solid #5BA2FE;
+  border-radius: 12px;
+}
+
+.dobSelection .dobVariable {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.dobSelection .dobVariable span {
+  font-size: 12px;
+}
+
+.nameInput input::placeholder {
+  font-size: 14px;
+}
+
+.genderAction {
+  display: flex;
+  gap: 24px;
+  padding: 12px 0;
+}
+
+.genderAction .genderBox {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #5BA2FE;
+  color: #5BA2FE;
+  padding: 12px 24px;
+  border-radius: 12px;
+  flex-direction: row;
+  max-width: fit-content;
+  box-shadow: 2px 4px 10px #5ba2fe3f;
+  transition-duration: 0.5s;
+  cursor: pointer;
+}
+
+.genderAction .genderBox:hover {
+  box-shadow: none;
+  transition: 0.5s;
+}
+
+.proceed,
+.back {
+  background-color: #5ba2fe;
+  color: #ffffff;
+  border: 0;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  max-width: fit-content;
+  font-size: 16px;
+  margin-top: 12px;
+  font-weight: 600;
+  box-shadow: 0px 6px 0px #bbd9ff;
+  transition-duration: 0.5s;
+}
+
+.proceed:hover,
+.back:hover {
+  box-shadow: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Weight Start */
+
+.weightContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  justify-content: space-between;
+
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputContainer .inputPack {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inputContainer .inputPack input {
+  padding: 16px 24px;
+  border: 1px solid #5BA2FE;
+  border-radius: 12px;
+  width: 100%;
+  font-size: 16px;
+  color: #5BA2FE;
+}
+
+.inputContainer .inputPack .inputMeasure {
+  padding: 16px 24px;
+  background-color: #5BA2FE;
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.error {
+  font-size: 14px;
+  margin-top: 12px;
+  border-bottom: 1px solid #5BA2FE;
+  max-width: fit-content;
+  padding-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+
+/* Weight End */
+
+
+/* Lifestyle Box */
+
+.lifestyleContainer {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 12px;
+}
+
+.lifestyleBox {
+  padding: 12px 24px;
+  border: 1px solid #5BA2FE;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.lifestyleBox h2 {
+  font-size: 14px;
+}
+
+.lifestyleBox p {
+  font-size: 12px;
+}
+
+.lifestyleBoxSelected {
+  background-color: #5BA2FE;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* Lifestyle End */
+
+/* Register start */
+
+.inputContainer {
+  display: flex;
+  gap: 24px;
+}
+
+.inputContainer>input {
+  border: 1px solid #5BA2FE;
+  padding: 20px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+/* Register End */
+
+/* Login start */
+
+.LoginComponent {
+  margin: 36px 12px;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.inputWrapper input {
+  padding: 24px 32px;
+  border: 1px solid #5BA2FE;
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+}
+
+.inputWrapper input:focus {
+  border-color: #007bff;
+}
+
+.placeholderLabel {
+  position: relative;
+  top: 24px;
+  max-width: fit-content;
+  font-size: 12px;
+  color: #007bff;
+  background-color: white;
+  padding: 0 5px;
+}
+
+/* Login end */
+
+@keyframes fadeInMove {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInMove2 {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.boxDesign {
+  width: 250px;
+  height: 250px;
+  border-radius: 500px;
+  position: fixed;
+  top: -100px;
+  right: -150px;
+  background-color: #5ba2fe35;
+  z-index: 0;
+  opacity: 0;
+  animation: fadeInMove 1s ease-in forwards;
+}
+
+.boxDesign2 {
+  width: 200px;
+  height: 200px;
+  border-radius: 500px;
+  position: fixed;
+  top: 550px;
+  left: -100px;
+  background-color: #5ba2fe35;
+  z-index: -1;
+  opacity: 0;
+  animation: fadeInMove2 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.loginDirect {
+  text-decoration: none;
+  color: #007bff;
+  font-size: 14px;
+  position: fixed;
+  bottom: 10px;
+  animation: fadeInMove 2s ease-in forwards;
+}
+
+/* welcome start */
+
+.welcomeContainer {
+  margin: 32px 16px;
+
+}
+
+/* welcome end */
+
+/* Authornavbar start */
+
+.authorNavbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.authorNavbar .userInfo {
+  display: flex;
+  gap: 12px;
+  flex-direction: row;
+  align-items: center;
+}
+
+
+.authorNavbar .userInfo .userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorNavbar .userInfo .userDetails .desc {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profileButton,
+.logoutButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  border: 0;
+  background-color: #5ba2fe1f;
+  cursor: pointer;
+  color: #5BA2FE;
+}
+
+/* AuthorNavbar End */
+
+.dashboard {
+  margin: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.bmiTool {
+  background-color: #ffffff;
+  box-shadow: 0px 4px 8px #00000020;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+}
+
+.bmiTool .toolHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bmiTool .bmiMetric {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.bmiMetric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-top: 24px;
+}
+
+.halfCircleProgress {
+  position: relative;
+  width: 200px;
+  height: 100px; /* Half-circle height */
+  overflow: hidden;
+}
+
+.halfCircleProgress::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  border: 10px solid #f0f0f0; /* Background color of the progress bar */
+  border-radius: 100px 100px 0 0;
+  border-bottom: none;
+  box-sizing: border-box;
+}
+
+.progressBar {
+  position: absolute;
+  width: 200px;
+  height: 100px;
+  border: 10px solid transparent; /* Transparent by default */
+  border-top: 10px solid #007bff; /* Default color, will be overridden */
+  border-left: 10px solid #007bff; /* Default color, will be overridden */
+  border-radius: 100px 100px 0 0;
+  box-sizing: border-box;
+  transform-origin: bottom center; /* Rotate from the bottom center */
+  transform: rotate(-180deg); /* Start from the left side */
+  transition: transform 1.5s ease-out, border-top-color 1.5s ease-out, border-left-color 1.5s ease-out;
+}
+
+.bmiValue {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.bmiDescription {
+  margin-top: -10px;
+  background-color: #ffffff;
+  padding: 6px 24px;
+  border: 1px solid #5BA2FE;
+  border-radius: 24px;
+  font-size: 14px;
+  color: #555;
+}
+
+.toggleButton {
+  background-color: #5ba2fe;
+  color: #ffffff;
+  border: 0;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  font-size: 16px;
+  /* margin-top: 12px; */
+  font-weight: 600;
+  box-shadow: 0px 6px 0px #bbd9ff;
+  transition-duration: 0.5s;
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  box-shadow: none;
+}
+
+.bmiInputs {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bmiInput {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bmiInput label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.bmiInput input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.checkButton {
+  background-color: #5ba2fe;
+  color: #ffffff;
+  border: 0;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  font-size: 16px;
+  margin-top: 12px;
+  font-weight: 600;
+  box-shadow: 0px 6px 0px #bbd9ff;
+  transition-duration: 0.5s;
+  cursor: pointer;
+}
+
+.checkButton:hover {
+  box-shadow: none;
+}
+
+.bmiGraph {
+  display: flex;
+  flex-direction: column;
+  padding-top: 24px;
+}
+
+
+/* Dashboard end */
+
+
+/* Profile start */
+
+.profile{
+  display: flex;
+  flex-direction: column;
+  margin: 36px 12px;
+}
+
+.profile .profileDetails{
+display: flex;
+flex-direction: column;
+padding: 24px 0;
+gap: 24px;
+font-weight: 600;
+
+}
+
+.profile .profileDetails .personalHeading{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  color: #5ba2fe;
+  border-bottom: 1px solid #5BA2FE;
+  padding-bottom: 12px;
+}
+
+.profile .profileDetails label{
+  font-size: 16px;
+}
+
+.profile .profileDetails input , select{
+  padding: 16px;
+  border-radius: 12px;
+  border: 0.5px solid rgb(227, 227, 227);
+}
+
+.twoButtons{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.twoButtons button{
+  width: 100%;
+}
+
+/* Profile End */
+
+/* DietTrack start */
+
+
+
+/* Diettrack End */
