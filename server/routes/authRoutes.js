@@ -34,6 +34,15 @@ router.get("/session", async (req, res) => {
   }
 });
 
+router.post("/logout",(req, res) => {
+  res.clearCookie("userId", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+  });
+  res.status(200).json({ message: "Logout successful" });
+});
+
 router.put("/:id", async (req, res) => {
   try {
     const { name, age, gender, weight, height, lifestyle } = req.body;

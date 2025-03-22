@@ -72,7 +72,7 @@ exports.logDiet = async (req, res) => {
 
 exports.getDietHistory = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.query; // FIXED: Extract userId from query, not params
 
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
@@ -83,7 +83,7 @@ exports.getDietHistory = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user.healthDiets || []);
+    res.json(user.healthDiets || []); // Return diet history
   } catch (error) {
     console.error("Error fetching diet history:", error);
     res.status(500).json({ message: "Server error", error: error.message });

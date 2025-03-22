@@ -291,10 +291,3 @@
   gap: 4px;
   cursor: pointer;
 }
-
-.calorie-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-top: 4px;
-}

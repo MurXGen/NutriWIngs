@@ -54,7 +54,7 @@ const Profile = () => {
     } else {
       bmr = 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
     }
-  
+
     // Adjust BMR based on lifestyle
     let recomCal;
     switch (lifestyle) {
@@ -70,7 +70,7 @@ const Profile = () => {
       default:
         recomCal = bmr * 1.2; // Default to sedentary
     }
-  
+
     // Round off the result to the nearest integer
     return Math.round(recomCal);
   };
@@ -84,9 +84,9 @@ const Profile = () => {
         updatedDetails.gender,
         updatedDetails.lifestyle
       );
-  
+
       console.log("Rounded RecomCal:", recomCal); // Log the rounded value
-  
+
       const updatePayload = {
         ...updatedDetails,
         healthDetails: {
@@ -96,17 +96,17 @@ const Profile = () => {
           RecomCal: recomCal, // Rounded value
         },
       };
-  
+
       console.log("Data being sent to the backend:", updatePayload);
-  
+
       const response = await axios.put(
         `http://localhost:5000/api/diet/update/${user._id}`,
         updatePayload,
         { withCredentials: true }
       );
-  
+
       console.log("Response from the backend:", response.data);
-  
+
       setUser(response.data);
       setIsEditing(false);
     } catch (error) {
@@ -115,9 +115,15 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
-    navigate("/login");
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+      console.log("Logout successful:", response.data); // Log success message
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error.response ? error.response.data : error.message);
+    }
   };
+
 
   if (loading) return <p>Loading...</p>;
   if (!user) return <p>User not logged in</p>;

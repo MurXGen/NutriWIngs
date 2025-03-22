@@ -27,10 +27,16 @@ const AuthorNavbar = () => {
     }, [navigate]);
 
     // Handle logout
-    const handleLogout = () => {
-        localStorage.removeItem("userId");
-        navigate("/login");
+    const handleLogout = async () => {
+        try {
+            const response = await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+            console.log("Logout successful:", response.data); // Log success message
+            navigate("/login");
+        } catch (error) {
+            console.error("Logout failed:", error.response ? error.response.data : error.message);
+        }
     };
+
 
     if (loading) return <p>Loading...</p>;
     if (!user) return null; // Don't render navbar if no user data
@@ -42,10 +48,10 @@ const AuthorNavbar = () => {
                     <img src={ProfileIcon} alt="" />
                 </button>
                 <div className="userDetails">
-                    <span style={{fontSize:'16px',fontWeight:'600',color:'#5BA2FE'}}>Hey, {user.name || "User"}</span>
+                    <span style={{ fontSize: '16px', fontWeight: '600', color: '#5BA2FE' }}>Hey, {user.name || "User"}</span>
                     <div className="desc">
-                    <span style={{fontSize:'14px'}}>{user.age || "Not Given"} ,</span>
-                    <span style={{fontSize:'14px'}}>{user.healthDetails?.lifestyle || "Not Given"}</span>
+                        <span style={{ fontSize: '14px' }}>{user.age || "Not Given"} ,</span>
+                        <span style={{ fontSize: '14px' }}>{user.healthDetails?.lifestyle || "Not Given"}</span>
                     </div>
                 </div>
             </div>
