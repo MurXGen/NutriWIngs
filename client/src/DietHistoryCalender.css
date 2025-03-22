@@ -1,17 +1,105 @@
 /* Highlight days where calories exceed 2000 */
-.high-calories {
-    background-color: red !important;
-    color: white !important;
-    border-radius: 50%;
-    font-weight: bold;
-  }
 
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  
-  
+.dietHistory {
+  margin: 32px 16px;
+}
+
+.high-calories {
+  background-color: red !important;
+  color: white !important;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.calenderView {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+
+}
+
+.daysHeader {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 12px;
+  place-items: center;
+}
+
+
+.pageNavigation{
+  display: flex;
+  flex-direction: row;
+align-items: center;
+margin: 24px 0;
+gap: 24px;
+}
+
+.pageNavigation{
+  font-weight: 500;
+  color: #5ba2fe;
+  font-size: 16px;
+}
+
+.pageNavigation button{
+border: 1px solid rgba(0, 0, 0, 0.169);
+border-radius: 12px;
+padding: 20px 24px;
+background-color: #ffffff;
+text-align: center;
+cursor: pointer;
+
+}
+
+.monthNav{
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #5ba2fe50;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0px 5px 8px #00000020;
+cursor: pointer;
+}
+
+
+.monthArrow{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #ffffff;
+  border: 1px solid #5ba2fe;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 60px;
+  color: #5ba2fe;
+  box-shadow: 0px 5px 8px #00000020;
+  cursor: pointer;
+  margin: -32px auto;
+}
+
+.monthNav button{
+  background-color: #5ba2fe;
+  color: #ffffff;
+  border: 0;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  font-size: 16px;
+  /* margin-top: 12px; */
+  font-weight: 600;
+  box-shadow: 0px 6px 0px #bbd9ff;
+  transition-duration: 0.5s;
+  cursor: pointer;
+}
