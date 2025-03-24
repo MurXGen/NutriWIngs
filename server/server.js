@@ -6,7 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const cookieParser = require("cookie-parser");
 const dietRoutes = require("./routes/dietRoutes");
 const dotenv = require('dotenv');
-const cloudinary = require("./config/cloudinary"); 
+const cloudinary = require("./config/cloudinaryConfig"); 
 
 
 dotenv.config();

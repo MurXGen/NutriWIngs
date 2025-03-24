@@ -164,46 +164,50 @@ const DietHistory = () => {
   >
     <h3>{selectedDate} - Total Calories: {totalCalories.toFixed(1)} kcal</h3>
 
-    {history.filter((entry) => entry.Date === selectedDate).length > 0 ? (
-      history
-        .filter((entry) => entry.Date === selectedDate)
-        .map((entry) => (
-          <motion.div 
-            key={entry.DietID} 
-            initial={{ opacity: 0, x: -10 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            transition={{ duration: 0.3, delay: 0.1 }} 
-            style={{ padding: "10px", borderBottom: "1px solid #ddd", position: "relative" }}
-          >
-            <p><strong>Food:</strong> {entry.FoodName}</p>
-            <p><strong>Portion Taken:</strong> {entry.DietTaken?.PortionSizeTaken?.toFixed(1) || "0"} g</p>
-            <p><strong>Carbs:</strong> {entry.DietTaken?.Carbs?.toFixed(1) || "0"} g</p>
-            <p><strong>Protein:</strong> {entry.DietTaken?.Protein?.toFixed(1) || "0"} g</p>
-            <p><strong>Fats:</strong> {entry.DietTaken?.Fats?.toFixed(1) || "0"} g</p>
-            
-            {/* Edit and Delete Buttons */}
-            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-              <button 
-                onClick={() => handleEdit(entry.DietID)} 
-                style={{ background: "#5ba2fe", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
-              >
-                Edit
-              </button>
-              
-              <button 
-                onClick={() => handleDelete(entry.DietID)} 
-                style={{ background: "#ff4d4d", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
-              >
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        ))
-    ) : (
-      <p style={{ textAlign: "center", color: "#777", fontStyle: "italic", marginTop: "10px" }}>
-        No diet added for this date.
-      </p>
-    )}
+    {history
+  .filter((entry) => entry.Date === selectedDate)
+  .map((entry) => (
+    <motion.div 
+      key={entry.DietID} 
+      initial={{ opacity: 0, x: -10 }} 
+      animate={{ opacity: 1, x: 0 }} 
+      transition={{ duration: 0.3, delay: 0.1 }} 
+      style={{ padding: "10px", borderBottom: "1px solid #ddd", position: "relative" }}
+    >
+      <p><strong>Food:</strong> {entry.FoodName}</p>
+      <p><strong>Portion Taken:</strong> {entry.DietTaken?.PortionSizeTaken?.toFixed(1) || "0"} g</p>
+      <p><strong>Carbs:</strong> {entry.DietTaken?.Carbs?.toFixed(1) || "0"} g</p>
+      <p><strong>Protein:</strong> {entry.DietTaken?.Protein?.toFixed(1) || "0"} g</p>
+      <p><strong>Fats:</strong> {entry.DietTaken?.Fats?.toFixed(1) || "0"} g</p>
+
+      {/* Display Image if Available */}
+      {entry.ImageUrl && (
+        <img 
+          src={entry.ImageUrl} 
+          alt={entry.FoodName} 
+          style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", marginTop: "10px" }}
+        />
+      )}
+
+      {/* Edit and Delete Buttons */}
+      <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+        <button 
+          onClick={() => handleEdit(entry.DietID)} 
+          style={{ background: "#5ba2fe", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
+        >
+          Edit
+        </button>
+        
+        <button 
+          onClick={() => handleDelete(entry.DietID)} 
+          style={{ background: "#ff4d4d", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
+        >
+          Delete
+        </button>
+      </div>
+    </motion.div>
+  ))}
+
   </motion.div>
 )}
 

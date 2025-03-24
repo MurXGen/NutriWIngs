@@ -1,9 +1,11 @@
 const express = require("express");
 const { logDiet, getDietHistory } = require("../controllers/dietController");
 const router = express.Router();
+const upload = require("../middlewares/multer");
 const User = require("../models/User");
+console.log('getDietHistory:', getDietHistory);
 
-router.post("/log", logDiet);
+router.post("/log", upload.single("foodImage"), logDiet);
 
 router.get("/get", async (req, res) => {
   try {

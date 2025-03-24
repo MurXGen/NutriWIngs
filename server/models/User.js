@@ -11,6 +11,7 @@ const DietSchema = new mongoose.Schema({
   Carbs: Number,
   Protein: Number,
   Fats: Number,
+  ImageUrl: { type: String },
   DietTaken: {
     CaloriesTaken: Number,
     PortionSizeTaken: Number,
