@@ -68,6 +68,12 @@ const DietHistory = () => {
     }, 1000);
   };
 
+  const handleEdit = (dietId) => {
+    if (!dietId) return;
+    navigate(`/log-diet?dietId=${dietId}`);
+  };
+  
+
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayIndex = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay(); // 0 for Sun, 1 for Mon...
   const today = new Date();
@@ -79,7 +85,6 @@ const DietHistory = () => {
   return (
     
     <motion.div className="dietHistory" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
-      <AuthorNavbar/>
       <div className="pageNavigation">
 
       <button onClick={() => navigate("/diet-tracker")}>{"<"}</button>
@@ -149,7 +154,7 @@ const DietHistory = () => {
 
       {/* Diet Details */}
      {/* Diet Details */}
-{selectedDate && (
+     {selectedDate && (
   <motion.div 
     className="diet-details" 
     initial={{ opacity: 0, y: 20 }} 
@@ -168,13 +173,30 @@ const DietHistory = () => {
             initial={{ opacity: 0, x: -10 }} 
             animate={{ opacity: 1, x: 0 }} 
             transition={{ duration: 0.3, delay: 0.1 }} 
-            style={{ paddingLeft: "10px" }}
+            style={{ padding: "10px", borderBottom: "1px solid #ddd", position: "relative" }}
           >
             <p><strong>Food:</strong> {entry.FoodName}</p>
             <p><strong>Portion Taken:</strong> {entry.DietTaken?.PortionSizeTaken?.toFixed(1) || "0"} g</p>
             <p><strong>Carbs:</strong> {entry.DietTaken?.Carbs?.toFixed(1) || "0"} g</p>
             <p><strong>Protein:</strong> {entry.DietTaken?.Protein?.toFixed(1) || "0"} g</p>
             <p><strong>Fats:</strong> {entry.DietTaken?.Fats?.toFixed(1) || "0"} g</p>
+            
+            {/* Edit and Delete Buttons */}
+            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+              <button 
+                onClick={() => handleEdit(entry.DietID)} 
+                style={{ background: "#5ba2fe", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
+              >
+                Edit
+              </button>
+              
+              <button 
+                onClick={() => handleDelete(entry.DietID)} 
+                style={{ background: "#ff4d4d", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
+              >
+                Delete
+              </button>
+            </div>
           </motion.div>
         ))
     ) : (
@@ -184,6 +206,7 @@ const DietHistory = () => {
     )}
   </motion.div>
 )}
+
 
     </motion.div>
   );

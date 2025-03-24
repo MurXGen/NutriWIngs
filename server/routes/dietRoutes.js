@@ -4,6 +4,27 @@ const router = express.Router();
 const User = require("../models/User");
 
 router.post("/log", logDiet);
+
+router.get("/get", async (req, res) => {
+  try {
+    const { userId, dietId } = req.query;
+    if (!userId || !dietId) {
+      return res.status(400).json({ error: "Missing userId or dietId" });
+    }
+
+    const user = await User.findOne({ _id: userId, "healthDiets.DietID": dietId }, { "healthDiets.$": 1 });
+
+    if (!user || !user.healthDiets.length) {
+      return res.status(404).json({ error: "Diet entry not found" });
+    }
+
+    res.json(user.healthDiets[0]);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 router.get("/history", getDietHistory);
 
 router.get("/diet-stats", async (req, res) => {

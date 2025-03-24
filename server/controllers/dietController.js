@@ -70,6 +70,7 @@ exports.logDiet = async (req, res) => {
   }
 };
 
+
 exports.getDietHistory = async (req, res) => {
   try {
     const { userId } = req.query; // FIXED: Extract userId from query, not params

@@ -31,6 +31,41 @@ const DietTrack = () => {
   const [recomCal, setRecomCal] = useState(null);
   const [calorieData, setCalorieData] = useState({});
 
+  // Animation variants for pop-out effect
+  const popOutVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: { scale: 1, opacity: 1 },
+  };
+
+  // Transition for staggered animations
+  const popOutTransition = {
+    type: "spring",
+    stiffness: 100,
+    damping: 10,
+    delay: 0.2,
+  };
+
+  const getDayLabel = (selectedDate) => {
+    const today = new Date();
+    const selected = new Date(selectedDate);
+
+    today.setHours(0, 0, 0, 0);
+    selected.setHours(0, 0, 0, 0);
+
+    const timeDiff = selected - today;
+    const dayDiff = timeDiff / (1000 * 60 * 60 * 24);
+
+    if (dayDiff === 0) {
+      return "Today";
+    } else if (dayDiff === -1) {
+      return "Yesterday";
+    } else if (dayDiff === -2) {
+      return "Day before yesterday";
+    } else {
+      return selected.toLocaleDateString("en-US", { weekday: "long" });
+    }
+  };
+
   useEffect(() => {
     setTimeout(() => {
       focusSelectedDate();
@@ -125,27 +160,6 @@ const DietTrack = () => {
     }
   };
 
-  const getDayLabel = (selectedDate) => {
-    const today = new Date();
-    const selected = new Date(selectedDate);
-
-    today.setHours(0, 0, 0, 0);
-    selected.setHours(0, 0, 0, 0);
-
-    const timeDiff = selected - today;
-    const dayDiff = timeDiff / (1000 * 60 * 60 * 24);
-
-    if (dayDiff === 0) {
-      return "Today";
-    } else if (dayDiff === -1) {
-      return "Yesterday";
-    } else if (dayDiff === -2) {
-      return "Day before yesterday";
-    } else {
-      return selected.toLocaleDateString("en-US", { weekday: "long" });
-    }
-  };
-
   const calorieDifference = recomCal ? dietStats.totalCalories - recomCal : 0;
   const dayStatusWord = calorieDifference > 0 ? "surplus" : "deficit";
   const dayStatusValue = Math.abs(calorieDifference);
@@ -173,12 +187,18 @@ const DietTrack = () => {
             transition={{ duration: 1.5, ease: "easeOut" }}
           ></motion.div>
           <div className="calorie-box">
-            <span style={{ fontSize: "32px", display: "flex", alignItems: "center", flexDirection: "column", gap: "12px", color: "#5ba2fe" }}>
+            <motion.span
+              style={{ fontSize: "32px", display: "flex", alignItems: "center", flexDirection: "column", gap: "12px", color: "#5ba2fe" }}
+              variants={popOutVariants}
+              initial="hidden"
+              animate="visible"
+              transition={popOutTransition}
+            >
               {dietStats.totalCalories}
               <span className="desc" style={{ fontSize: "12px", padding: "2px 12px", borderRadius: "4px", background: "#5ba2fe20" }}>
                 Kcal
               </span>
-            </span>
+            </motion.span>
             <span style={{ fontSize: "12px", fontWeight: "500", maxWidth: "100px" }}>
               You're in{" "}
               <strong
@@ -203,20 +223,38 @@ const DietTrack = () => {
         </div>
 
         <div className="Macros">
-          <div className="carbs">
+          <motion.div
+            className="carbs"
+            variants={popOutVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ ...popOutTransition, delay: 0.4 }}
+          >
             <span className="label">Carbs</span>
             <span className="value">{dietStats.totalCarbs} g</span>
-          </div>
+          </motion.div>
 
-          <div className="protein">
+          <motion.div
+            className="protein"
+            variants={popOutVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ ...popOutTransition, delay: 0.6 }}
+          >
             <span className="label">Protein</span>
             <span className="value">{dietStats.totalProtein} g</span>
-          </div>
+          </motion.div>
 
-          <div className="fats">
+          <motion.div
+            className="fats"
+            variants={popOutVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ ...popOutTransition, delay: 0.8 }}
+          >
             <span className="label">Fats</span>
             <span className="value">{dietStats.totalFats} g</span>
-          </div>
+          </motion.div>
         </div>
         <div className="dietButtons">
           <button onClick={() => navigate("/log-diet")} className="checkButton">
@@ -260,7 +298,7 @@ const DietTrack = () => {
               >
                 <span className="day">{day}</span>
                 <span className="date">{date}</span>
-                {dotColor && <div style={{color:'#5ba2fe'}}>{dotColor}</div>}
+                {dotColor && <div style={{ color: "#5ba2fe" }}>{dotColor}</div>}
               </div>
             );
           })}

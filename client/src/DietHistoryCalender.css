@@ -35,44 +35,57 @@
 }
 
 
-.pageNavigation{
+.pageNavigation {
   display: flex;
   flex-direction: row;
-align-items: center;
-margin: 24px 0;
-gap: 24px;
+  align-items: center;
+  margin: 24px 0;
+  gap: 24px;
 }
 
-.pageNavigation{
+.pageNavigation {
   font-weight: 500;
   color: #5ba2fe;
   font-size: 16px;
 }
 
-.pageNavigation button{
-border: 1px solid rgba(0, 0, 0, 0.169);
-border-radius: 12px;
-padding: 20px 24px;
-background-color: #ffffff;
-text-align: center;
-cursor: pointer;
+.pageNavigation button {
+  border: 1px solid rgba(0, 0, 0, 0.169);
+  border-radius: 12px;
+  padding: 20px 24px;
+  background-color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0px 5px 8px #00000020;
+  transition-duration: 0.3s;
+}
+
+.pageNavigation button:hover {
+  box-shadow: none;
+  transition: 0.3s;
 
 }
 
-.monthNav{
+.monthNav {
   display: flex;
-  justify-content: space-between; 
+  justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
   border: 1px solid #5ba2fe50;
-  padding: 12px;
+  padding: 24px 12px;
   border-radius: 12px;
   box-shadow: 0px 5px 8px #00000020;
-cursor: pointer;
+  cursor: pointer;
+  transition-duration: 0.3s;
+}
+
+.monthNav:hover {
+  box-shadow: none;
+  
 }
 
 
-.monthArrow{
+.monthArrow {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -87,7 +100,7 @@ cursor: pointer;
   margin: -32px auto;
 }
 
-.monthNav button{
+.monthNav button {
   background-color: #5ba2fe;
   color: #ffffff;
   border: 0;
