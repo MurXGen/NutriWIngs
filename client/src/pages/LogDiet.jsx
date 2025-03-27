@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import imageCompression from "browser-image-compression";
+import { motion, AnimatePresence } from "framer-motion";
+import { IceCreamBowl, NotepadTextDashed, Upload } from 'lucide-react'
+
 
 const LogDiet = () => {
   const navigate = useNavigate();
@@ -8,6 +12,10 @@ const LogDiet = () => {
   const queryParams = new URLSearchParams(location.search);
   const dietId = queryParams.get("dietId");
   const userId = localStorage.getItem("userId");
+  const [isMobileFocused, setIsMobileFocused] = useState(false);
+
+  const getCurrentDate = () => new Date().toISOString().split("T")[0];
+  const getCurrentTime = () => new Date().toTimeString().slice(0, 5);
 
   const [diet, setDiet] = useState({
     foodName: "",
@@ -17,26 +25,48 @@ const LogDiet = () => {
     protein: "",
     fats: "",
     totalCalories: 0,
-    date: "",
-    time: "",
+    date: getCurrentDate(),
+    time: getCurrentTime(),
     dietStatus: "Draft",
     imageUrl: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!!dietId);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
 
   const roundToOneDecimal = (value) => (value ? Math.round(value * 10) / 10 : 0);
-  const calculateCalories = (carbs, protein, fats) => roundToOneDecimal(carbs * 4 + protein * 4 + fats * 9);
+  const calculateCalories = (carbs, protein, fats) =>
+    roundToOneDecimal(carbs * 4 + protein * 4 + fats * 9);
 
   useEffect(() => {
     if (dietId) {
       const fetchDiet = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`http://localhost:5000/api/diet/${dietId}`);
-          setDiet(response.data);
+          const response = await axios.get(`http://localhost:5000/api/diet/dietEdit/${dietId}`);
+          const fetchedDiet = response.data;
+
+          setDiet({
+            foodName: fetchedDiet.FoodName || "",
+            portionSize: fetchedDiet.PortionSize || "",
+            portionSizeTaken: fetchedDiet.DietTaken?.PortionSizeTaken || "",
+            carbs: fetchedDiet.Carbs || "",
+            protein: fetchedDiet.Protein || "",
+            fats: fetchedDiet.Fats || "",
+            totalCalories: calculateCalories(
+              fetchedDiet.Carbs || 0,
+              fetchedDiet.Protein || 0,
+              fetchedDiet.Fats || 0
+            ),
+            date: fetchedDiet.Date || getCurrentDate(),
+            time: fetchedDiet.Time || getCurrentTime(),
+            dietStatus: fetchedDiet.DietStatus || "Draft",
+            imageUrl: fetchedDiet.ImageUrl || "",
+          });
+
+          if (fetchedDiet.ImageUrl) setPreviewImage(fetchedDiet.ImageUrl);
         } catch (err) {
           setError("Failed to fetch diet details.");
         } finally {
@@ -49,6 +79,7 @@ const LogDiet = () => {
 
   const handleChange = (e) => {
     let { name, value } = e.target;
+
     if (["carbs", "protein", "fats"].includes(name)) {
       value = value ? roundToOneDecimal(parseFloat(value)) : "";
     }
@@ -56,6 +87,7 @@ const LogDiet = () => {
     setDiet((prevDiet) => {
       const updatedDiet = { ...prevDiet, [name]: value };
 
+      // Recalculate total calories when macros change
       if (["carbs", "protein", "fats"].includes(name)) {
         updatedDiet.totalCalories = calculateCalories(
           parseFloat(updatedDiet.carbs) || 0,
@@ -68,18 +100,39 @@ const LogDiet = () => {
     });
   };
 
-  const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
+  // Handle File Selection
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      // Compress the image before uploading
+      const options = { maxSizeMB: 0.5, maxWidthOrHeight: 800, useWebWorker: true };
+      const compressedFile = await imageCompression(file, options);
+      setImageFile(compressedFile);
+
+      // Show preview
+      const imageURL = URL.createObjectURL(compressedFile);
+      setPreviewImage(imageURL);
+    } catch (error) {
+      console.error("Image compression error:", error);
+      setError("Image compression failed.");
+    }
   };
 
+  // Upload Image to Cloudinary
   const uploadImage = async () => {
     if (!imageFile) return null;
+
     const formData = new FormData();
     formData.append("file", imageFile);
     formData.append("upload_preset", "Nutriwings");
 
     try {
-      const response = await axios.post("https://api.cloudinary.com/v1_1/dhjplff89/image/upload", formData);
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dhjplff89/image/upload",
+        formData
+      );
       return response.data.secure_url;
     } catch (err) {
       setError("Image upload failed.");
@@ -87,6 +140,7 @@ const LogDiet = () => {
     }
   };
 
+  // Handle Form Submission
   const handleSubmit = async (e, status) => {
     e.preventDefault();
     setLoading(true);
@@ -98,12 +152,14 @@ const LogDiet = () => {
       return;
     }
 
-    if (!imageFile && !diet.imageUrl) {
+    // Image is required for saving but not for drafts
+    if (status === "Saved" && !imageFile && !diet.imageUrl) {
       setError("Image is required.");
       setLoading(false);
       return;
     }
 
+    // Upload Image if a new one is selected
     let uploadedImageUrl = diet.imageUrl;
     if (imageFile) {
       uploadedImageUrl = await uploadImage();
@@ -113,6 +169,7 @@ const LogDiet = () => {
       }
     }
 
+    // Construct diet object
     const dietData = {
       userId,
       foodName: diet.foodName || "",
@@ -128,9 +185,10 @@ const LogDiet = () => {
       imageUrl: uploadedImageUrl,
     };
 
-    // Validation only for "Save", not for "Draft"
+    // Validate required fields only when "Save" is clicked
     if (status === "Saved") {
-      if (!diet.foodName || !diet.portionSize || !diet.portionSizeTaken || !diet.date || !diet.time) {
+      const requiredFields = ["foodName", "portionSize", "portionSizeTaken", "date", "time"];
+      if (requiredFields.some((field) => !diet[field])) {
         setError("All fields are required except for Draft mode.");
         setLoading(false);
         return;
@@ -140,10 +198,12 @@ const LogDiet = () => {
     try {
       let response;
       if (dietId) {
-        response = await axios.put(`http://localhost:5000/api/diet/${dietId}`, dietData, {
+        // Update existing diet
+        response = await axios.put(`http://localhost:5000/api/diet/updateDiet/${dietId}`, dietData, {
           headers: { "Content-Type": "application/json" },
         });
       } else {
+        // Log new diet entry
         response = await axios.post("http://localhost:5000/api/diet/log", dietData, {
           headers: { "Content-Type": "application/json" },
         });
@@ -159,6 +219,7 @@ const LogDiet = () => {
     }
   };
 
+
   return (
     <div className="logDiet">
       <div className="pageNavigation">
@@ -166,27 +227,107 @@ const LogDiet = () => {
         <span>{dietId ? "Edit Diet" : "Log Diet"}</span>
       </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="errorText">{error}</p>}
 
       <form>
-        <input type="text" name="foodName" value={diet.foodName || ""} placeholder="Food Name" onChange={handleChange} />
-        <input type="number" name="portionSize" value={diet.portionSize || ""} placeholder="Portion Size (g)" onChange={handleChange} />
-        <input type="number" name="portionSizeTaken" value={diet.portionSizeTaken || ""} placeholder="Portion Size Taken (g)" onChange={handleChange} />
-        <input type="number" name="carbs" value={diet.carbs || ""} placeholder="Carbs (g)" step="0.1" onChange={handleChange} />
-        <input type="number" name="protein" value={diet.protein || ""} placeholder="Protein (g)" step="0.1" onChange={handleChange} />
-        <input type="number" name="fats" value={diet.fats || ""} placeholder="Fats (g)" step="0.1" onChange={handleChange} />
-        <input type="date" name="date" value={diet.date ? diet.date.split("T")[0] : ""} onChange={handleChange} />
-        <input type="time" name="time" value={diet.time || ""} onChange={handleChange} />
+        <div className="img_cal_sizeContainer">
+          {/* Clickable Image Upload Box */}
+          <div className="imgContainer">
+            <label htmlFor="fileInput" className="uploadLabel">
+              {previewImage ? (
+                <img src={previewImage} alt="Uploaded" className="previewImage" />
+              ) : (
 
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-        {diet.imageUrl && <img src={diet.imageUrl} alt="Diet Image" width="100" />}
+                <span><Upload />Take Snap of your Meal</span>
+              )}
+            </label>
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              hidden
+            />
+          </div>
 
-        <button type="button" onClick={(e) => handleSubmit(e, "Draft")} disabled={loading}>
-          {loading ? "Saving Draft..." : "Save as Draft"}
-        </button>
-        <button type="button" onClick={(e) => handleSubmit(e, "Save")} disabled={loading}>
-          {loading ? "Submitting..." : "Save"}
-        </button>
+          {/* Display Real-time Calories */}
+          <div className="cal_sizeContainer">
+            <div className="calContainer">
+              <span>Total Calories:</span>
+              <span>{diet.totalCalories} <strong>kcal</strong></span>
+            </div>
+            <div className="sizeContainer">
+              <input
+                type="number"
+                name="portionSizeTaken"
+                value={diet.portionSizeTaken || ""}
+                placeholder="Portion Size Taken (g)"
+                onChange={handleChange}
+                style={{ marginLeft: '12px', width: '100%' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="food_inputContainer">
+
+          <span><IceCreamBowl />Food name</span>
+          <input
+            type="text"
+            name="foodName"
+            value={diet.foodName || ""}
+            placeholder="Food Name"
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="food_inputContainer">
+          <span><NotepadTextDashed />Nutritional Values</span>
+          <input
+            type="number"
+            name="portionSize"
+            value={diet.portionSize || ""}
+            placeholder="Portion Size (50g) or (100g)"
+            onChange={handleChange}
+            style={{ width: '100%' }}
+          />
+          <div className="macrosValue">
+            <input
+              type="number"
+              name="carbs"
+              value={diet.carbs || ""}
+              placeholder="Carbs (g)"
+              step="0.1"
+              onChange={handleChange}
+            />
+            <input
+              type="number"
+              name="protein"
+              value={diet.protein || ""}
+              placeholder="Protein (g)"
+              step="0.1"
+              onChange={handleChange}
+            />
+            <input
+              type="number"
+              name="fats"
+              value={diet.fats || ""}
+              placeholder="Fats (g)"
+              step="0.1"
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        <div className="actionButtons">
+          <button type="button" className="toggleButton" onClick={(e) => handleSubmit(e, "Draft")} disabled={loading}>
+            {loading ? "Saving Draft..." : "Save as Draft"}
+          </button>
+          <button type="button" className="toggleButtonLight" onClick={(e) => handleSubmit(e, "Save")} disabled={loading}>
+            {loading ? "Submitting..." : "Save"}
+          </button>
+        </div>
+
       </form>
     </div>
   );

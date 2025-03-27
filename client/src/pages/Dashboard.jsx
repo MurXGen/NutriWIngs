@@ -164,6 +164,9 @@ const Dashboard = () => {
           <button className="dietTrackerButton" onClick={() => navigate("/diet-tracker")}>
             Go to Diet Tracker
           </button>
+          <button className="dietTrackerButton" onClick={() => navigate("/workout")}>
+            Go to Workout Tracker
+          </button>
         </div>
       </div>
     </div>

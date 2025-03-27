@@ -21,6 +21,21 @@ const DietSchema = new mongoose.Schema({
   }
 });
 
+const workoutSchema = new mongoose.Schema({
+  name: String,
+  imageUrl: String,
+  category: String,
+  sets: [
+    {
+      reps: [Number], // Array to store multiple reps per set
+      failure: Boolean, // Yes/No
+      weights: [Number], // Array to store multiple weights per set
+    },
+  ],
+  startDateTime: Date,
+  duration: Number, // In seconds
+});
+
 const UserSchema = new mongoose.Schema({
   name: { type: String, default: "" },
   age: { type: Number, required: true },
@@ -35,7 +50,8 @@ const UserSchema = new mongoose.Schema({
     lifestyle: { type: String, required: true },
     RecomCal: { type: Number, required: true }
   },
-  healthDiets: [DietSchema]
+  healthDiets: [DietSchema],
+  workouts: [workoutSchema], // Array of workouts
 });
 
 module.exports = mongoose.model("User", UserSchema);

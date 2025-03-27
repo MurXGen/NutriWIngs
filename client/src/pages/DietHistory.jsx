@@ -70,7 +70,7 @@ const DietHistory = () => {
 
   const handleEdit = (dietId) => {
     if (!dietId) return;
-    navigate(`/log-diet?dietId=${dietId}`);
+    navigate(`/log-diet?dietId=${dietId}`); // Pass dietId as query param
   };
   
 

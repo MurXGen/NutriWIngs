@@ -162,7 +162,8 @@ const DietTrack = () => {
 
   const calorieDifference = recomCal ? dietStats.totalCalories - recomCal : 0;
   const dayStatusWord = calorieDifference > 0 ? "surplus" : "deficit";
-  const dayStatusValue = Math.abs(calorieDifference);
+  const dayStatusValue = Math.abs(calorieDifference).toFixed(1);
+
 
   const caloriePercentage = recomCal ? Math.min((dietStats.totalCalories / recomCal) * 100, 100) : 0;
 

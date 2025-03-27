@@ -8,6 +8,8 @@ import DietTrack from "./pages/DietTrack";
 import LogDiet from "./pages/LogDiet";
 import DietHistory from "./pages/DietHistory";
 import Welcome from "./pages/Welcome";
+import Workout from "./pages/Workout";
+import LiveWorkout from "./pages/LiveWorkout";
 
 const App = () => {
   return (
@@ -18,6 +20,8 @@ const App = () => {
       <Route path="/log-diet" element={<LogDiet />} />
       <Route path="/diet-history" element={<DietHistory />} />
       <Route path="/welcome" element={<Welcome/>}/>
+      <Route path="/workout" element={<Workout />} />
+      <Route path="/loglive-workout" element={<LiveWorkout />} />
 
 
       {/* Protected Routes for authenticated users */}

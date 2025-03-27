@@ -89,12 +89,114 @@ const logDiet = async (req, res) => {
   }
 };
 
+const getDietById = async (req, res) => {
+  const { dietId } = req.params;
+  try {
+    const user = await User.findOne(
+      { "healthDiets.DietID": dietId.toString() }, // Convert to String
+      { "healthDiets.$": 1 } // Projection to return only matched diet
+    );
 
+    if (!user || !user.healthDiets.length) {
+      return res.status(404).json({ message: "Diet entry not found" });
+    }
+    res.json(user.healthDiets[0]);
+  } catch (error) {
+    console.error("Error fetching diet:", error); // Debugging
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 
+const updateDiet = async (req, res) => {
+  try {
+    const { 
+      userId, foodName, date, time, dietStatus, portionSize, totalCalories, carbs, protein, fats, portionSizeTaken, imageUrl 
+    } = req.body;
+    const { dietId } = req.params;
 
+    console.log("Received update request:", req.body); // ✅ Console log to verify request data
 
+    // Validate user existence
+    const user = await User.findOne({ "healthDiets.DietID": dietId });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
+    let finalImageUrl = imageUrl || ""; // Use existing image URL
 
+    // Upload image to Cloudinary if a new file is provided
+    if (!imageUrl && req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path);
+        finalImageUrl = result.secure_url;
+      } catch (uploadError) {
+        console.error("Cloudinary Upload Error:", uploadError.message);
+        return res.status(500).json({ message: "Image upload failed", error: uploadError.message });
+      }
+    }
+
+    // Map diet status
+    const dietStatusMap = {
+      saved: "Saved",
+      draft: "Draft"
+    };
+    const validatedDietStatus = dietStatusMap[dietStatus] || "Saved";
+
+    // Function to round values
+    const roundToOneDecimal = (num) => isNaN(num) ? 0 : parseFloat(num.toFixed(1));
+
+    // Convert and round values
+    const portionSizeNum = roundToOneDecimal(parseFloat(portionSize) || 0);
+    const portionSizeTakenNum = roundToOneDecimal(parseFloat(portionSizeTaken) || 0);
+    const totalCaloriesNum = roundToOneDecimal(parseFloat(totalCalories) || 0);
+    const carbsNum = roundToOneDecimal(parseFloat(carbs) || 0);
+    const proteinNum = roundToOneDecimal(parseFloat(protein) || 0);
+    const fatsNum = roundToOneDecimal(parseFloat(fats) || 0);
+
+    // Calculate DietTaken values
+    let dietTaken = {
+      CaloriesTaken: 0,
+      PortionSizeTaken: portionSizeTakenNum,
+      Carbs: 0,
+      Protein: 0,
+      Fats: 0
+    };
+
+    if (portionSizeTakenNum > 0 && portionSizeNum > 0) {
+      const ratio = portionSizeTakenNum / portionSizeNum;
+      dietTaken.CaloriesTaken = roundToOneDecimal(ratio * totalCaloriesNum);
+      dietTaken.Carbs = roundToOneDecimal(ratio * carbsNum);
+      dietTaken.Protein = roundToOneDecimal(ratio * proteinNum);
+      dietTaken.Fats = roundToOneDecimal(ratio * fatsNum);
+    }
+
+    // Update the diet entry inside `healthDiets`
+    const updatedDiet = await User.findOneAndUpdate(
+      { "healthDiets.DietID": dietId },
+      {
+        $set: {
+          "healthDiets.$.FoodName": foodName,
+          "healthDiets.$.Date": date,
+          "healthDiets.$.Time": time,
+          "healthDiets.$.DietStatus": validatedDietStatus,
+          "healthDiets.$.PortionSize": portionSizeNum,
+          "healthDiets.$.TotalCalories": totalCaloriesNum,
+          "healthDiets.$.Carbs": carbsNum,
+          "healthDiets.$.Protein": proteinNum,
+          "healthDiets.$.Fats": fatsNum,
+          "healthDiets.$.ImageUrl": finalImageUrl,
+          "healthDiets.$.DietTaken": dietTaken
+        }
+      },
+      { new: true }
+    );
+
+    if (!updatedDiet) return res.status(404).json({ message: "Diet entry not found" });
+
+    res.status(200).json({ message: "Diet updated successfully", diet: updatedDiet });
+  } catch (error) {
+    console.error("Diet Update Error:", error.message);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
 
 
 
@@ -119,4 +221,4 @@ const getDietHistory = async (req, res) => {
 };
   
 
-module.exports = { logDiet ,getDietHistory};
+module.exports = {getDietById, logDiet ,getDietHistory,updateDiet};

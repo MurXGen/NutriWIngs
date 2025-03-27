@@ -13,7 +13,7 @@ const RegisterNavbar = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-        <img src={NutriIcon} alt="NutriLogo" style={{width:'80px'}}/>
+        <img src={NutriIcon} alt="NutriLogo" style={{cursor:'pointer',width:'80px'}} onClick={() => navigate("/")}/>
     </motion.nav>
   );
 };
