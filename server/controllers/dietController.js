@@ -25,15 +25,6 @@ const logDiet = async (req, res) => {
       }
     }
 
-    // Mapping frontend values to valid schema values
-    const dietStatusMap = {
-      saved: "Saved",
-      draft: "Draft"
-    };
-    
-    // Validate dietStatus
-    const validatedDietStatus = dietStatusMap[dietStatus] || "Saved"; // Default to "Planned"
-
     // Function to round values to 1 decimal place
     const roundToOneDecimal = (num) => isNaN(num) ? 0 : parseFloat(num.toFixed(1));
 
@@ -68,7 +59,7 @@ const logDiet = async (req, res) => {
       FoodName: foodName,
       Date: date,
       Time: time,
-      DietStatus: validatedDietStatus, // Mapped dietStatus
+      DietStatus: dietStatus,
       PortionSize: portionSizeNum,
       TotalCalories: totalCaloriesNum,
       Carbs: carbsNum,

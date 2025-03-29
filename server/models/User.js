@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const DietSchema = new mongoose.Schema({
   DietID: { type: String, required: true },
-  FoodName: { type: String, required: true },
+  FoodName: { type: String},
   Date: { type: String, required: true },
   Time: { type: String, required: true },
   DietStatus: { type: String, enum: ["Draft", "Saved", "Quick"], required: true },
@@ -21,20 +21,6 @@ const DietSchema = new mongoose.Schema({
   }
 });
 
-const workoutSchema = new mongoose.Schema({
-  name: String,
-  imageUrl: String,
-  category: String,
-  sets: [
-    {
-      reps: [Number], // Array to store multiple reps per set
-      failure: Boolean, // Yes/No
-      weights: [Number], // Array to store multiple weights per set
-    },
-  ],
-  startDateTime: Date,
-  duration: Number, // In seconds
-});
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, default: "" },
@@ -51,7 +37,7 @@ const UserSchema = new mongoose.Schema({
     RecomCal: { type: Number, required: true }
   },
   healthDiets: [DietSchema],
-  workouts: [workoutSchema], // Array of workouts
+ 
 });
 
 module.exports = mongoose.model("User", UserSchema);

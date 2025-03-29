@@ -234,6 +234,7 @@ body {
   gap: 12px;
   justify-content: space-between;
   padding: 12px 0;
+
 }
 
 .inputContainer {
@@ -659,8 +660,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 32px;
-  font-size: 16px;
+  padding: 16px 32px; 
+  font-size: 12px;
   margin-top: 12px;
   font-weight: 600;
   box-shadow: 0px 6px 0px #bbd9ff;
@@ -918,7 +919,8 @@ select {
 
 .input-group input:focus {
   outline: none;
-  border-color: #4f46e5; /* Change to your preferred focus color */
+  border-color: #4f46e5;
+  /* Change to your preferred focus color */
 }
 
 .input-label {
@@ -937,7 +939,8 @@ select {
 .input-label.focused {
   top: 0;
   transform: translateY(-50%) scale(0.9);
-  color: #4f46e5; /* Change to match your focus color */
+  color: #4f46e5;
+  /* Change to match your focus color */
   font-size: 0.8rem;
 }
 
@@ -964,12 +967,12 @@ select {
 
 /* Workout templates */
 
-.live-workout{
-  margin: 32px 16px;
+.workoutLive {
+  margin: 32px 12px 120px 12px;
 }
 
 
-.searchContainer{
+.searchContainer {
   display: flex;
   width: 100%;
 }
@@ -1048,13 +1051,303 @@ select {
   box-shadow: inset 4px 4px 5px rgb(69, 69, 69);
 }
 
-/* Show More Button */
 .show-more-btn {
   display: block;
   margin: 20px auto;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+}
+
+
+/* Timer Section */
+.timerDuration {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 32px 0;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.timerActions {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0;
+  width: 100%;
+}
+
+.showAfterStart {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.timerActions button {
+  background: #fff;
+  box-shadow: 1px 1px 8px #d3e2ff;;
+  padding: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 1px solid #00000020;
+  transition-duration: 0.3s;
+  width: 100%;
+}
+
+.timerActions button:hover {
+  box-shadow: none;
+
+}
+
+.timerCount {
+  background: #fff;
+  border: 2px solid #d3e2ff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5ba2fe;
+}
+
+.timerCount span {
+  background: #fff;
+  border: 2px solid #d3e2ff;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* Workout Container */
+.workoutContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.workoutCard input {
+  border: 0;
+  border-bottom: 1px solid #5ba2fe;
+  padding: 16px 16px;
+  border-radius: 12px;
+
+}
+
+.workoutCard input:focus {
+  outline: none;
+  border: 2px solid #5ba2fe60;
+  box-shadow: 0 0 0 3px #5ba2fe20;
+  transition: all 0.1s ease;
+}
+
+.workoutCard input::placeholder {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.addActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  box-shadow: 1px 4px 8px #5ba2fe60;
+  z-index: 1;
+  background-color: white;
+  padding: 12px;
+  min-width: 330px;
+  max-width: 350px;
+
+}
+
+.addActions button {
+  width: 100%;
+  font-size: 12px;
+
+}
+
+.showWorkout {
+  background: #d3e2ff;
+  padding: 16px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  width: 50%;
+  color: #5ba2fe;
+  text-align: center;
+  font-size: 12px;
+}
+
+/* Workout Cards */
+.workoutCards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.workoutCard {
+  background: #f9fafe;
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 1px 1px 8px #d3e2ff;
+  position: relative;
+}
+
+.cancelWorkout {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  padding: 12px 20px;
+  border-radius: 42px;
+  border: 0;
+  background-color: #5ba2fe;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.cancelWorkout:disabled {
+  background-color: #5ba2fe20;
+  cursor: not-allowed;
+}
+
+.workoutImg {
+  width: 100%;
+  height: 250px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.workoutImg img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+
+
+
+.workoutForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.workoutForm span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.workoutSet {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Sets */
+.sets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.set {
+  display: flex;
+  gap: 6px;
+}
+
+.selectedSet {
+  background: #5ba2fe;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.notSelectedSet {
+  background: #5ba2fe40;
+  color: #5ba2fe;
+  padding: 6px 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Animation for the popup */
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+}
+
+.success-popup {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.success-popup.hide {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.removeSet {
+  background-color: #5BA2FE;
+  border: 0;
+
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+}
+
+.reps,
+.weights {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Failure Option */
+.failure {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+
+
+.failure>div {
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 

@@ -12,7 +12,7 @@ const WorkoutTemplates = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // const API_KEY = "8475311212msh7e0f4801aeee83cp189f89jsnd728e30a048c";
+  const API_KEY = "8475311212msh7e0f4801aeee83cp189f89jsnd728e30a048c";
 
   // Function to fetch workouts from API
   const fetchWorkouts = useCallback(async (retryCount = 3) => {
