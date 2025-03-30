@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { saveWorkout } = require("../controllers/workoutController");
-const { getWorkoutHistory, updateWorkout, deleteWorkout } = require("../controllers/workoutController");
+const { saveWorkout,getWorkoutHistory } = require("../controllers/workoutController");
 
 
 router.post("/save-workout", saveWorkout);
+router.get("/workout-history", getWorkoutHistory);
+
 
 module.exports = router;

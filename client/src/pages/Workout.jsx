@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import WorkoutTemplates from "../components/WorkoutTemplates";
-// import WorkoutHistory from "../components/WorkoutHistory";
+import WorkoutHistory from "../components/WorkoutHistory";
 
 const Workout = () => {
   const [sessionMinutes, setSessionMinutes] = useState(0);
@@ -68,8 +68,8 @@ const Workout = () => {
       <h3>Your Past Workouts</h3>
       {/* past workout to be shown later */}
 
-      <WorkoutTemplates/>
-      {/* <WorkoutHistory/> */}
+      {/* <WorkoutTemplates/> */}
+      <WorkoutHistory/>
     </div>
   );
 };
