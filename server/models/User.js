@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const DietSchema = new mongoose.Schema({
   DietID: { type: String, required: true },
-  FoodName: { type: String},
+  FoodName: { type: String },
   Date: { type: String, required: true },
   Time: { type: String, required: true },
   DietStatus: { type: String, enum: ["Draft", "Saved", "Quick"], required: true },
@@ -21,6 +21,22 @@ const DietSchema = new mongoose.Schema({
   }
 });
 
+// Recovery Factors Schema
+const RecoverySchema = new mongoose.Schema({
+  waterIntake: [
+    {
+      recordDateTime: { type: Date, default: Date.now },
+      waterContent: { type: Number, required: true } // in ml
+    }
+  ],
+  sleepTrack: [
+    {
+      startDateTime: { type: Date, default: null },
+      endDateTime: { type: Date, default: null },
+      totalDuration: { type: Number } // in seconds
+    }
+  ]
+});
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, default: "" },
@@ -37,7 +53,7 @@ const UserSchema = new mongoose.Schema({
     RecomCal: { type: Number, required: true }
   },
   healthDiets: [DietSchema],
- 
+  recoveryFactors: { type: RecoverySchema, default: () => ({}) }
 });
 
 module.exports = mongoose.model("User", UserSchema);

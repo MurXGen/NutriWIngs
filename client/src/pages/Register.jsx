@@ -62,7 +62,6 @@ const Register = () => {
     <div className="registerContainer">
       <Navbar/>
       <div className="boxDesign">
-
       </div>
       <div className="boxDesign2">
 
