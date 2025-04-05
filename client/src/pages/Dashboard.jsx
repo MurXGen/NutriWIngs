@@ -4,11 +4,12 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthorNavbar from "../components/AuthorNavbar";
 import BmiHeading from '../assets/BmiHeading.svg';
-import { Salad, Dumbbell } from 'lucide-react';
+import { Salad, Dumbbell, CircleX, ArrowRight, Lamp, CircleFadingPlus, Hourglass } from 'lucide-react';
 import foodTrack from '../assets/Dashboard/foodTrack.svg';
 import workoutSession from '../assets/Dashboard/workoutSession.svg';
 import Quick from '../assets/Dashboard/quick.svg';
 import Proceed from '../assets/Dashboard/proceed.svg';
+import Sleep from '../assets/Dashboard/sleepLabel.svg';
 
 // =================== Component =================== //
 const Dashboard = () => {
@@ -32,6 +33,85 @@ const Dashboard = () => {
   const [showTimer, setShowTimer] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [totalSleepDuration, setTotalSleepDuration] = useState(0); // in seconds
+
+  const [durationValue, setDurationValue] = useState("");
+  const [durationUnit, setDurationUnit] = useState("hours"); // 'hours' or 'minutes'
+
+  const [waterInput, setWaterInput] = useState(250);
+  const [waterHistory, setWaterHistory] = useState([]);
+
+  const [totalWater, setTotalWater] = useState(0);
+  const dailyGoal = 3000; // 3000ml per day
+  const [refresh, setRefresh] = useState(false);
+
+  const fetchWaterEntries = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
+      setWaterHistory(res.data.entries || []);
+    } catch (error) {
+      console.error('Error fetching water history:', error);
+    }
+  };
+
+  // Add water entry
+  const handleAddWater = async () => {
+    if (!waterInput || isNaN(waterInput) || waterInput <= 0) return;
+
+    try {
+      await axios.post(`http://localhost:5000/api/water/add/${userId}`, {
+        waterContent: Number(waterInput),
+      });
+      setWaterInput(250); // reset input
+      fetchWaterEntries(); // refresh
+      setRefresh(prev => !prev); // <--- refetch trigger
+    } catch (error) {
+      console.error('Error adding water entry:', error);
+    }
+  };
+
+  // Delete entry
+  const handleDeleteEntry = async (entryId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/water/delete/${userId}/${entryId}`);
+      fetchWaterEntries(); // refresh
+      setRefresh(prev => !prev); // <--- refetch trigger
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchTotalWater = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
+        const total = res.data.entries.reduce((sum, entry) => sum + entry.waterContent, 0);
+        setTotalWater(total);
+      } catch (err) {
+        console.error("Failed to fetch total water:", err);
+      }
+    };
+
+    if (userId) fetchTotalWater();
+  }, [userId, refresh]); // refetch on userId or refresh change
+
+  const fillPercent = Math.min((totalWater / dailyGoal) * 100, 100);
+  useEffect(() => {
+    if (userId) fetchWaterEntries();
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      const fetchEntries = async () => {
+        const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
+        const total = res.data.entries.reduce((sum, e) => sum + e.waterContent, 0);
+        setTotalWater(total);
+      };
+      fetchEntries();
+    }
+  }, [userId]);
+
+
 
   // ----------- Animation Variants ----------- //
   const popInEffect = {
@@ -96,18 +176,27 @@ const Dashboard = () => {
     const fetchLatestSleep = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/sleep/latest/${userId}`);
-        if (res.data.latestSleep && !res.data.latestSleep.endDateTime) {
-          setStartDateTime(res.data.latestSleep.startDateTime);
-          setElapsedTime(Math.floor((Date.now() - new Date(res.data.latestSleep.startDateTime)) / 1000));
-          setShowTimer(true);
+        const latest = res.data.latestSleep;
+
+        if (latest && latest.startDateTime && !latest.endDateTime) {
+          const start = new Date(latest.startDateTime);
+
+          // ✅ Ensure startDateTime is a valid date
+          if (!isNaN(start.getTime())) {
+            const diffInSeconds = Math.floor((Date.now() - start.getTime()) / 1000);
+            setStartDateTime(latest.startDateTime);
+            setElapsedTime(diffInSeconds);
+            setShowTimer(true);
+          }
         }
       } catch (error) {
         console.error("Error fetching sleep data:", error);
       }
     };
 
-    fetchLatestSleep();
+    if (userId) fetchLatestSleep();
   }, [userId]);
+
 
   useEffect(() => {
     let interval;
@@ -118,6 +207,29 @@ const Dashboard = () => {
     }
     return () => clearInterval(interval);
   }, [showTimer, startDateTime]);
+
+  useEffect(() => {
+    const fetchTotalSleep = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/sleep/total/${userId}`);
+        setTotalSleepDuration(res.data.totalDuration || 0);
+      } catch (error) {
+        console.error("Error fetching total sleep duration:", error);
+      }
+    };
+
+    if (userId) fetchTotalSleep();
+  }, [userId]);
+
+  const formatSleepDuration = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    return `${hrs} hrs ${mins} mins ${secs} s`;
+  };
+
+
 
 
   // ----------- Utility Functions ----------- //
@@ -154,8 +266,22 @@ const Dashboard = () => {
     const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
     const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
     const secs = String(seconds % 60).padStart(2, "0");
-    return `${hrs}H:${mins}M:${secs}S`;
+    return `${hrs} h : ${mins} m : ${secs} s`;
   };
+
+  function formatSleepEntryDuration(durationInSeconds) {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds % 3600) / 60);
+    const seconds = durationInSeconds % 60;
+
+    let result = "";
+    if (hours > 0) result += `${hours}hrs `;
+    if (minutes > 0) result += `${minutes}mins `;
+    if (seconds > 0) result += `${seconds}s`;
+
+    return result.trim() || "0s";
+  }
+
 
   // ----------- Handlers ----------- //
   const handleLogout = () => {
@@ -213,15 +339,58 @@ const Dashboard = () => {
     setShowTimer(false);
   };
 
+  // Submit duration with unit conversion
   const handleSubmitDuration = async () => {
-    const durationInSeconds = parseInt(duration) * 60 * 60;
-    await axios.post("http://localhost:5000/api/sleep/manual", {
-      userId,
-      duration: durationInSeconds,
-    });
-    setDuration("");
-    setShowInput(false);
+    try {
+      const value = parseInt(durationValue);
+      if (isNaN(value) || value <= 0) return;
+
+      const durationInSeconds = durationUnit === "hours" ? value * 3600 : value * 60;
+
+      await axios.post("http://localhost:5000/api/sleep/manual", {
+        userId,
+        duration: durationInSeconds,
+      });
+
+      setDurationValue("");
+      setShowInput(false);
+      fetchSleepEntries(); // Refresh after entry
+    } catch (error) {
+      console.error("Error submitting manual sleep:", error);
+    }
   };
+
+  // Delete a specific entry
+  const handleDeleteSleepEntry = async (entryId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/sleep/delete/${userId}/${entryId}`);
+      fetchSleepEntries(); // Refresh after delete
+    } catch (err) {
+      console.error("Error deleting sleep entry:", err);
+    }
+  };
+
+  // State to store manual entries
+  const [sleepEntries, setSleepEntries] = useState([]);
+
+  // Fetch today's sleep entries
+  const fetchSleepEntries = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/sleep/entries/${userId}`);
+      console.log("Fetched entries:", res.data.entries); // 👈 add this
+      setSleepEntries(res.data.entries);
+    } catch (error) {
+      console.error("Error fetching sleep entries:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      fetchSleepEntries();
+    }
+  }, [userId]);
+
+
 
   // ----------- Return JSX ----------- //
   if (loading) return <p>Loading...</p>;
@@ -274,19 +443,78 @@ const Dashboard = () => {
         </div>
       </motion.div>
 
+      <div className="waterTrack">
+        <div className="labelCont">
+          <img src={Sleep} alt="sleep" />
+          <span>Water Tracker</span>
+        </div>
+
+        <div className="waterContent">
+          <div className="waterGlass">
+            <div className="waterFill" style={{ height: `${fillPercent}%` }}>
+              <div className="wave" />
+              <div className="wave wave2" />
+              <div className="glassOverlay">
+                {totalWater} ml
+              </div>
+            </div>
+          </div>
+
+
+          <div className="waterActions">
+            <div className="note">
+              <span>Hydrate to Fresh mind and skin</span>
+            </div>
+
+            <div className="waterInput">
+              <input
+                type="number"
+                value={waterInput}
+                onChange={(e) => setWaterInput(e.target.value)}
+              />
+              <span>ml</span>
+              <button onClick={handleAddWater}>Add</button>
+            </div>
+
+            <div className="waterHistory">
+              {waterHistory.length === 0 ? (
+                <span>No water entries for today.</span>
+              ) : (
+                waterHistory.map((entry) => (
+                  <div key={entry._id} className="entryRow">
+                    <span>{entry.waterContent} ml</span>
+                    <button onClick={() => handleDeleteEntry(entry._id)}>🗑</button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* --- Sleep Tracker --- */}
       <div className="sleepTrack">
         <div className="labelCont">
-          <span>Sleep<br />Tracker</span>
+          <div>
+            <img src={Sleep} alt="sleep" />
+            <span>Sleep Tracker</span>
+          </div>
+
+          <div className="showTotalDuration">
+            <span style={{ color: 'black' }}>{formatSleepDuration(totalSleepDuration)}</span>
+
+          </div>
         </div>
 
         <motion.div className="sleepActions" layout>
           {!showTimer && !showInput && (
             <>
               <motion.button onClick={handleStart} whileTap={{ scale: 0.9 }}>
-                Start
+                <Hourglass />
+                Start Timer
               </motion.button>
               <motion.button onClick={handleEnterDuration} whileTap={{ scale: 0.9 }}>
+                <CircleFadingPlus />
                 Enter Duration
               </motion.button>
             </>
@@ -301,10 +529,14 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <span>{formatTime(elapsedTime)}</span>
-              <motion.button onClick={handleStop} whileTap={{ scale: 0.95 }}>
-                Stop
-              </motion.button>
+              <span className="note"><Lamp /> Have a peaceful sleep !</span>
+              <div className="timerDisplay">
+                <span>{formatTime(elapsedTime)}</span>
+                <motion.button onClick={handleStop} whileTap={{ scale: 0.95 }}>
+                  Stop
+                </motion.button>
+              </div>
+
             </motion.div>
           )}
 
@@ -315,18 +547,64 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
+
+
               <input
                 type="number"
-                value={duration}
-                placeholder="Duration in minutes"
-                onChange={(e) => setDuration(e.target.value)}
+                value={durationValue}
+                placeholder={`~ ${durationUnit}`}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "" || Number(val) >= 0) {
+                    setDurationValue(val);
+                  }
+                }}
+                min="0"
+                required
               />
+
+              <div className="durationToggle">
+                <button
+                  className={`toggleBox ${durationUnit === "hours" ? "selected" : ""}`}
+                  onClick={() => setDurationUnit("hours")}
+                >
+                  Hrs
+                </button>
+                <button
+                  className={`toggleBox ${durationUnit === "minutes" ? "selected" : ""}`}
+                  onClick={() => setDurationUnit("minutes")}
+                >
+                  Mins
+                </button>
+              </div>
+
+
               <motion.button onClick={handleSubmitDuration} whileTap={{ scale: 0.95 }}>
-                Submit
+
+                <ArrowRight color="white" />
               </motion.button>
             </motion.div>
           )}
+
         </AnimatePresence>
+
+
+        <div className="sleepHistory">
+          {sleepEntries.length === 0 && <p>No records yet.</p>}
+
+          <div className="sleepEnteries">
+            {sleepEntries.map((entry) => (
+              <div className="sleepEntry" key={entry._id}>
+                <span>{formatSleepEntryDuration(entry.totalDuration)}</span>
+                <button onClick={() => handleDeleteSleepEntry(entry._id)}>
+                  <CircleX size={"16px"} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+
       </div>
 
       {/* --- BMI Tracker --- */}
@@ -380,7 +658,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };
 

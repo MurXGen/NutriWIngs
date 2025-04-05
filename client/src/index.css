@@ -5,6 +5,10 @@ body {
 
 }
 
+*{
+  font-family: 'poppins';
+}
+
 /* Register Container */
 
 .registerContainer {
@@ -496,11 +500,301 @@ body {
   gap: 24px;
 }
 
+.waterGlass {
+  width: 100px;
+  height: 200px;
+  border: 4px solid #4ca1af;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.waterFill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: #4ca1af;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  transition: height 0.6s ease-in-out;
+}
+
+.wave {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 40%;
+  animation: waveAnim 4s linear infinite;
+  transform: rotate(0deg);
+  top: -20%;
+  left: -50%;
+}
+
+.wave2 {
+  animation-delay: 2s;
+  opacity: 0.6;
+}
+
+.glassOverlay {
+  position: absolute;
+  bottom: 10px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+  z-index: 2;
+}
+
+@keyframes waveAnim {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+
+.sleepTrack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: #fff;
+  padding: 24px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.showTimer{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.timerDisplay{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.showTimer span{
+font-size: 14px;
+color: #5ba2fe;
+font-weight: 600;
+}
+
+.showTimer button , .showDurationInput > button{
+  background-color: #5ba2fe;
+  color: #ffffff;
+  border: 0;
+  width: 50%;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0px 6px 0px #bbd9ff;
+  transition-duration: 0.5s;
+  cursor: pointer;
+}
+
+.showDurationInput > button{
+  width: 30%;
+  height: 50px;
+}
+
+.showTimer button:hover, .showDurationInput > button:hover{
+  box-shadow: none;
+}
+
+.showTimer .note{
+background-color: #5ba2fe20;
+color: #5ba2fe;
+padding: 12px 24px;
+border-radius: 24px;
+font-size: 12px;
+font-weight: 500;
+text-align: center;
+display: flex;
+align-items: center;
+gap: 12px;
+width: 90%;
+justify-content: center;
+}
+
+.showDurationInput{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.showDurationInput input{
+background-color: #5ba2fe10;
+border: 0;
+border-radius: 12px;
+border-bottom: 1px solid #5ba2fe;
+padding: 0 12px;
+font-size: 14px;
+font-weight: 600;
+transition-duration: 0.5s;
+color: #5ba2fe;
+width: 80%;
+}
+
+.showDurationInput input::placeholder{
+  opacity: 0.7;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: 'poppins';
+}
+
+.durationToggle {
+  display: flex;
+  gap: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.toggleBox {
+  padding: 12px 6px;
+  border: 0;
+  color: #5ba2fe;
+  background-color: #5ba2fe20;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 12px;
+  width: 40px;
+  height: 40px;
+}
+
+.toggleBox.selected {
+  background-color: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+
+
+.showDurationInput input:focus{
+  border: 2px solid #5ba2fe;
+  outline: 5px solid #5ba2fe30;
+  transition: 0.5s;
+}
+
+
+.sleepTrack .labelCont {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+
+.sleepTrack .labelCont > div {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+}
+
+.sleepTrack .labelCont span{
+  font-size: 12px;
+  color: #5ba2fe;
+  font-weight: 600;
+}
+
+.sleepHistory{
+  display: flex;
+  flex-direction: column;
+  gap:12px;
+}
+
+.sleepHistory > p{
+  font-size: 12px;
+}
+
+.sleepHistory .sleepEnteries{
+  display: flex;
+  justify-content: start;
+  gap: 12px;
+  overflow: scroll;
+  flex-direction: row-reverse;
+}
+
+.sleepHistory .sleepEnteries .sleepEntry{
+  background-color: #5ba2fe20;
+  color: #006eff;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  gap: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.sleepHistory .sleepEnteries .sleepEntry button{
+  background: red;
+  color: white;
+  border: 0;
+  padding: 4px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.sleepActions{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sleepActions button{
+  background-color: #5ba2fe;
+  color: #ffffff;
+  border: 0;
+  width: 100%;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content:start;
+  padding: 16px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0px 6px 0px #bbd9ff;
+  transition-duration: 0.5s;
+  cursor: pointer;
+  gap: 6px;
+}
+
+.sleepActions button:hover{
+  box-shadow: none;
+  transition: 0.3s;
+
+}
+
+
 .otherMetrics {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin: 12px 0;
+  margin: 12px 0 0 0;
 }
 
 .otherMetrics>div {
@@ -510,29 +804,19 @@ body {
   border-radius: 12px;
   width: 100%;
   display: grid;
-  position: relative;
 }
 
 .otherMetrics>div>.labelCont {
   display: flex;
   flex-direction: row;
-  width: 120px;
-  align-items: center;
-  font-size: 12px;
   gap: 12px;
-  padding: 12px 16px;
-  /* border: 0.5px solid; */
-  border-radius: 12px;
-  position: absolute;
-  top: -12px;
-  background: white;
-  transform: translateX(-50%);
-  left: 50%;
-  box-shadow: 0px 4px 8px #00000020;
+  align-items: center;
 }
 
 .otherMetrics>div>.labelCont span {
-  font-size: 10px;
+  font-size: 12px;
+  color: #5ba2fe;
+  font-weight: 600;
 }
 
 .otherMetrics>div>.labelCont img {
@@ -544,7 +828,7 @@ body {
   flex-direction: column;
   gap: 12px;
   margin: 24px 0;
-  padding: 12px 12px;
+  padding: 0 12px;
 }
 
 
