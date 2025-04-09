@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
 import { motion, AnimatePresence } from "framer-motion";
-import { IceCreamBowl, NotepadTextDashed, Upload,Info } from 'lucide-react'
+import { IceCreamBowl, NotepadTextDashed, Upload, Info } from 'lucide-react'
 
 
 const LogDiet = () => {
@@ -17,6 +17,9 @@ const LogDiet = () => {
   const getCurrentDate = () => new Date().toISOString().split("T")[0];
   const getCurrentTime = () => new Date().toTimeString().slice(0, 5);
 
+  const preselectedDate = location.state?.date;
+  const preselectedTime = location.state?.time;
+
   const [diet, setDiet] = useState({
     foodName: "",
     portionSize: "",
@@ -25,8 +28,8 @@ const LogDiet = () => {
     protein: "",
     fats: "",
     totalCalories: 0,
-    date: getCurrentDate(),
-    time: getCurrentTime(),
+    date: preselectedDate || getCurrentDate(),
+    time: preselectedTime || getCurrentTime(),
     dietStatus: "Draft",
     imageUrl: "",
   });
@@ -146,121 +149,152 @@ const LogDiet = () => {
     setError(null);
 
     if (!userId) {
-        setError("User not logged in");
-        setLoading(false);
-        return;
+      setError("User not logged in");
+      setLoading(false);
+      return;
     }
 
     // If "Save as Draft" is clicked, ensure an image is present
     if (status === "Draft" && !imageFile && !diet.imageUrl) {
-        setError("Image is required to save as a draft.");
-        setLoading(false);
-        return;
+      setError("Image is required to save as a draft.");
+      setLoading(false);
+      return;
     }
 
     // If "Save" is clicked, ensure all required fields are filled
     if (status === "Saved") {
-        const requiredFields = ["foodName", "portionSize", "portionSizeTaken", "carbs", "protein", "fats", "date", "time"];
-        if (requiredFields.some((field) => !diet[field]?.toString().trim())) {
-            setError("To Save, fill in all details");
-            setLoading(false);
-            return;
-        }
+      const requiredFields = ["foodName", "portionSize", "portionSizeTaken", "carbs", "protein", "fats", "date", "time"];
+      if (requiredFields.some((field) => !diet[field]?.toString().trim())) {
+        setError("To Save, fill in all details");
+        setLoading(false);
+        return;
+      }
 
-        // Ensure an image is present
-        if (!imageFile && !diet.imageUrl) {
-            setError("Image is required to save the diet.");
-            setLoading(false);
-            return;
-        }
+      // Ensure an image is present
+      if (!imageFile && !diet.imageUrl) {
+        setError("Image is required to save the diet.");
+        setLoading(false);
+        return;
+      }
     }
 
     // Upload Image if a new one is selected
     let uploadedImageUrl = diet.imageUrl;
     if (imageFile) {
-        uploadedImageUrl = await uploadImage();
-        if (!uploadedImageUrl) {
-            setLoading(false);
-            return;
-        }
+      uploadedImageUrl = await uploadImage();
+      if (!uploadedImageUrl) {
+        setLoading(false);
+        return;
+      }
     }
 
     // Construct the diet object
     const dietData = {
-        userId,
-        foodName: diet.foodName || "",
-        portionSize: diet.portionSize || "",
-        portionSizeTaken: diet.portionSizeTaken || "",
-        carbs: roundToOneDecimal(parseFloat(diet.carbs) || 0),
-        protein: roundToOneDecimal(parseFloat(diet.protein) || 0),
-        fats: roundToOneDecimal(parseFloat(diet.fats) || 0),
-        totalCalories: roundToOneDecimal(diet.totalCalories) || 0,
-        date: diet.date || "",
-        time: diet.time || "",
-        dietStatus: status, // Assign "Draft" or "Saved" based on button clicked
-        imageUrl: uploadedImageUrl,
+      userId,
+      foodName: diet.foodName || "",
+      portionSize: diet.portionSize || "",
+      portionSizeTaken: diet.portionSizeTaken || "",
+      carbs: roundToOneDecimal(parseFloat(diet.carbs) || 0),
+      protein: roundToOneDecimal(parseFloat(diet.protein) || 0),
+      fats: roundToOneDecimal(parseFloat(diet.fats) || 0),
+      totalCalories: roundToOneDecimal(diet.totalCalories) || 0,
+      date: diet.date || "",
+      time: diet.time || "",
+      dietStatus: status, // Assign "Draft" or "Saved" based on button clicked
+      imageUrl: uploadedImageUrl,
     };
 
     try {
-        let response;
-        if (dietId) {
-            response = await axios.put(`http://localhost:5000/api/diet/updateDiet/${dietId}`, dietData, {
-                headers: { "Content-Type": "application/json" },
-            });
-        } else {
-            response = await axios.post("http://localhost:5000/api/diet/log", dietData, {
-                headers: { "Content-Type": "application/json" },
-            });
-        }
+      let response;
+      if (dietId) {
+        response = await axios.put(`http://localhost:5000/api/diet/updateDiet/${dietId}`, dietData, {
+          headers: { "Content-Type": "application/json" },
+        });
+      } else {
+        response = await axios.post("http://localhost:5000/api/diet/log", dietData, {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
 
-        if (response.status === 200 || response.status === 201) {
-            navigate("/diet-history");
-        }
+      if (response.status === 200 || response.status === 201) {
+        navigate("/diet-history");
+      }
     } catch (err) {
-        setError(err.response?.data?.message || "Error logging diet.");
+      setError(err.response?.data?.message || "Error logging diet.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
+  const handleDateChange = (e) => {
+    setDiet((prev) => ({ ...prev, date: e.target.value }));
+  };
 
+  const handleTimeChange = (e) => {
+    setDiet((prev) => ({ ...prev, time: e.target.value }));
+  };
 
 
 
   return (
     <div className="logDiet">
+
       <div className="pageNavigation">
         <button onClick={() => navigate("/diet-tracker")}>{"<"}</button>
         <span>{dietId ? "Edit Diet" : "Log Diet"}</span>
       </div>
 
+      <div className="dateTimeForLog">
+        
+        <label style={{ display: "block", marginBottom: "8px" }}>
+          Date:
+          <input
+            type="date"
+            value={diet.date}
+            onChange={handleDateChange}
+            style={{ marginLeft: "10px", padding: "5px" }}
+          />
+        </label>
+
+        {/* Time Picker */}
+        <label style={{ display: "block", marginTop: "12px", marginBottom: "8px" }}>
+          Time:
+          <input
+            type="time"
+            value={diet.time}
+            onChange={handleTimeChange}
+            style={{ marginLeft: "10px", padding: "5px" }}
+          />
+        </label>
+      </div>
+
       {error && (
-  <motion.div
-    initial={{ opacity: 0, y: -20, scale: 0.9 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    exit={{ opacity: 0, y: -20, scale: 0.9 }}
-    transition={{ duration: 0.3, ease: "easeOut" }}
-    className="errorText"
-    style={{
-      background: "white",
-      padding: "12px",
-      position: "fixed",
-      top: "24px",
-      fontSize: "14px",
-      display: "flex",
-      alignItems: "start",
-      gap: "12px",
-      color: "red",
-      border: "1px solid red",
-      borderRadius: "12px",
-      width: "80%",
-      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-    }}
-  >
-    <Info />
-    {error}
-  </motion.div>
-)}
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.9 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="errorText"
+          style={{
+            background: "white",
+            padding: "12px",
+            position: "fixed",
+            top: "24px",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "start",
+            gap: "12px",
+            color: "red",
+            border: "1px solid red",
+            borderRadius: "12px",
+            width: "80%",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Info />
+          {error}
+        </motion.div>
+      )}
 
       <form>
         <div className="img_cal_sizeContainer">

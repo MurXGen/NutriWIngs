@@ -18,6 +18,10 @@
   margin-top: 10px;
 }
 
+.calendar-grid > button:disabled{
+opacity: 0.2;
+}
+
 .calenderView {
   display: flex;
   flex-direction: column;

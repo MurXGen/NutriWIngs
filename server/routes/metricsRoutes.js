@@ -1,6 +1,6 @@
 const express = require("express");
 const { getDailyMetrics } = require("../controllers/metricsController");
-const { deleteWaterEntry, getTodaysWaterEntries, addWaterEntry, deleteSleepEntry, getTodaysSleepEntries, getTotalSleepDuration, startSleep, stopSleep, manualSleepEntry, getLatestSleep } = require("../controllers/metricsController");
+const { calculateStrengthScore,deleteWaterEntry, getTodaysWaterEntries, addWaterEntry, deleteSleepEntry, getTodaysSleepEntries, getTotalSleepDuration, startSleep, stopSleep, manualSleepEntry, getLatestSleep } = require("../controllers/metricsController");
 const router = express.Router();
 
 router.delete("/sleep/delete/:userId/:entryId", deleteSleepEntry);
@@ -21,6 +21,10 @@ router.get("/sleep/latest/:userId", getLatestSleep);
 router.post('/water/add/:userId', addWaterEntry);
 router.get('/water/today/:userId', getTodaysWaterEntries);
 router.delete('/water/delete/:userId/:entryId', deleteWaterEntry);
+
+// Progress Metrics
+
+router.get("/strength/daily-score/:userId", calculateStrengthScore);
 
 router.get("/daily-metrics", getDailyMetrics); // Fetch today's metrics
 

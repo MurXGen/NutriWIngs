@@ -80,6 +80,44 @@ const logDiet = async (req, res) => {
   }
 };
 
+const deleteDietEntry = async (req, res) => {
+  const { userId, dietId } = req.params;
+
+  try {
+    console.log(`Attempting to delete diet entry for userId: ${userId}, dietId: ${dietId}`);
+
+    // Step 1: Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log("User found. Diet entries before deletion:", user.healthDiets.length);
+
+    // Step 2: Filter out the diet with matching DietID
+    const initialLength = user.healthDiets.length;
+    user.healthDiets = user.healthDiets.filter(diet => diet.DietID !== dietId);
+
+    // Step 3: Check if deletion happened
+    if (user.healthDiets.length === initialLength) {
+      console.log("DietID not found in user's healthDiets");
+      return res.status(404).json({ message: "Diet entry not found" });
+    }
+
+    console.log("Diet entry deleted. Saving user document...");
+    await user.save();
+
+    console.log("User saved successfully. Returning success response.");
+    res.status(200).json({ message: "Diet entry deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting diet entry:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
 const getDietById = async (req, res) => {
   const { dietId } = req.params;
   try {
@@ -212,4 +250,4 @@ const getDietHistory = async (req, res) => {
 };
   
 
-module.exports = {getDietById, logDiet ,getDietHistory,updateDiet};
+module.exports = {getDietById, logDiet ,getDietHistory,updateDiet,deleteDietEntry};

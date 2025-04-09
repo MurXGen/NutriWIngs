@@ -16,6 +16,8 @@ const LiveWorkout = () => {
   const [workoutMode, setWorkoutMode] = useState(null); // "timer" or "manual"
   const [duration, setDuration] = useState(""); // Store manual duration
   const [error, setError] = useState("");
+  const [StartTimer,setStartTimer] = useState("")
+
 
   const [currentWorkouts, setCurrentWorkouts] = useState([
     {
@@ -48,11 +50,10 @@ const LiveWorkout = () => {
     setHasStarted(true);
     setIsRunning(true);
     setIsPaused(false);
-    // Update start time for all current workouts
+    setStartTimer(new Date().toISOString())
     setCurrentWorkouts(prev =>
       prev.map(workout => ({
-        ...workout,
-        startTime: new Date().toISOString()
+        ...workout
       }))
     );
   };
@@ -67,47 +68,47 @@ const LiveWorkout = () => {
 
   const handleStop = async () => {
     for (let workout of currentWorkouts) {
-        // 🚨 Save the latest set before validation 🚨
-        if (workout.currentReps || workout.currentWeight) {
-            workout.actions[workout.currentSet] = {
-                reps: workout.currentReps,
-                weight: workout.currentWeight,
-                failure: workout.currentFailure,
-            };
+      // 🚨 Save the latest set before validation 🚨
+      if (workout.currentReps || workout.currentWeight) {
+        workout.actions[workout.currentSet] = {
+          reps: workout.currentReps,
+          weight: workout.currentWeight,
+          failure: workout.currentFailure,
+        };
+      }
+
+      // 🚨 Validate input fields before stopping 🚨
+      if (!workout.workoutName.trim()) {
+        setError("Please enter a Workout Name before stopping.");
+        setTimeout(() => setError(""), 3000);
+        return;
+      }
+      if (!workout.category.trim()) {
+        setError("Please select a Workout Category before stopping.");
+        setTimeout(() => setError(""), 3000);
+        return;
+      }
+      if (Object.keys(workout.actions).length === 0) {
+        setError(`Please add at least one set for ${workout.workoutName}.`);
+        setTimeout(() => setError(""), 3000);
+        return;
+      }
+
+      for (let setNumber in workout.actions) {
+        const set = workout.actions[setNumber];
+
+        if (!set.reps || isNaN(set.reps) || parseInt(set.reps) <= 0) {
+          setError(`Please enter a valid number of reps for Set ${setNumber} in ${workout.workoutName}.`);
+          setTimeout(() => setError(""), 3000);
+          return;
         }
 
-        // 🚨 Validate input fields before stopping 🚨
-        if (!workout.workoutName.trim()) {
-            setError("Please enter a Workout Name before stopping.");
-            setTimeout(() => setError(""), 3000);
-            return;
+        if (!set.weight || isNaN(set.weight) || parseFloat(set.weight) <= 0) {
+          setError(`Please enter a valid weight for Set ${setNumber} in ${workout.workoutName}.`);
+          setTimeout(() => setError(""), 3000);
+          return;
         }
-        if (!workout.category.trim()) {
-            setError("Please select a Workout Category before stopping.");
-            setTimeout(() => setError(""), 3000);
-            return;
-        }
-        if (Object.keys(workout.actions).length === 0) {
-            setError(`Please add at least one set for ${workout.workoutName}.`);
-            setTimeout(() => setError(""), 3000);
-            return;
-        }
-
-        for (let setNumber in workout.actions) {
-            const set = workout.actions[setNumber];
-
-            if (!set.reps || isNaN(set.reps) || parseInt(set.reps) <= 0) {
-                setError(`Please enter a valid number of reps for Set ${setNumber} in ${workout.workoutName}.`);
-                setTimeout(() => setError(""), 3000);
-                return;
-            }
-
-            if (!set.weight || isNaN(set.weight) || parseFloat(set.weight) <= 0) {
-                setError(`Please enter a valid weight for Set ${setNumber} in ${workout.workoutName}.`);
-                setTimeout(() => setError(""), 3000);
-                return;
-            }
-        }
+      }
     }
 
     // ✅ If all validations pass, proceed to save workout  
@@ -116,56 +117,51 @@ const LiveWorkout = () => {
     setIsPaused(false);
 
     const completedWorkouts = currentWorkouts.map(workout => ({
-        ...workout,
-        duration: timer,
+      ...workout,
     }));
 
     setWorkouts(prev => [...prev, ...completedWorkouts]);
     setCurrentWorkouts([{ // Reset state
-        id: Date.now(),
-        workoutName: "",
-        imageUrl: "",
-        category: "",
-        actions: {},
-        currentSet: 1,
-        currentReps: "",
-        currentWeight: "",
-        currentFailure: "no"
+      id: Date.now(),
+      workoutName: "",
+      imageUrl: "",
+      category: "",
+      actions: {},
+      currentSet: 1,
+      currentReps: "",
+      currentWeight: "",
+      currentFailure: "no"
     }]);
     setWorkoutCount(1);
     setTimer(0);
 
     try {
-        const response = await fetch("http://localhost:5000/api/workouts/save-workout", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ workouts: completedWorkouts }),
-        });
+      const response = await fetch("http://localhost:5000/api/workouts/save-workout", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          workouts: completedWorkouts,
+          duration: workoutMode === "manual" ? Math.round(parseFloat(duration) * 60 * 10) / 10 : timer,
+          startTime: StartTimer || new Date().toISOString(),
+        }),
+      });
 
-        const data = await response.json();
-        console.log("Workout saved:", data);
-
-        // Show success popup
-        setPopupMessage("Workout saved successfully! 🎉");
-        setShowSuccessPopup(true);
-
-        // Auto-hide popup and then redirect
-        setTimeout(() => {
-            setShowSuccessPopup(false);
-            navigate("/workout");
-        }, 1000);
+      const data = await response.json();
+      
+      console.log("Workout saved:", data);
+      navigate("/workout");
     } catch (error) {
-        console.error("Error saving workout:", error);
-        setError("Failed to save workout 😢");
-        setTimeout(() => setError(""), 3000);
+      console.error("Error saving workout:", error);
+      setError("Failed to save workout 😢");
+      setTimeout(() => setError(""), 3000);
     }
-};
+  };
 
 
-  
+
 
   const handleAddWorkout = () => {
     setCurrentWorkouts(prev => [

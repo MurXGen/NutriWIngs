@@ -1,5 +1,5 @@
 const express = require("express");
-const { logDiet, getDietHistory,updateDiet,getDietById } = require("../controllers/dietController");
+const { logDiet, getDietHistory,updateDiet,getDietById,deleteDietEntry } = require("../controllers/dietController");
 const router = express.Router();
 const upload = require("../middlewares/multer");
 const User = require("../models/User");
@@ -154,5 +154,7 @@ router.get("/calorie-data", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+router.delete('/delete/:userId/:dietId', deleteDietEntry);
 
 module.exports = router;

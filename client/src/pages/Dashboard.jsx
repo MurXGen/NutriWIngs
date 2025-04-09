@@ -4,12 +4,13 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthorNavbar from "../components/AuthorNavbar";
 import BmiHeading from '../assets/BmiHeading.svg';
-import { Salad, Dumbbell, CircleX, ArrowRight, Lamp, CircleFadingPlus, Hourglass } from 'lucide-react';
+import { Salad, Dumbbell,Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass } from 'lucide-react';
 import foodTrack from '../assets/Dashboard/foodTrack.svg';
 import workoutSession from '../assets/Dashboard/workoutSession.svg';
 import Quick from '../assets/Dashboard/quick.svg';
 import Proceed from '../assets/Dashboard/proceed.svg';
 import Sleep from '../assets/Dashboard/sleepLabel.svg';
+import Muscle from '../assets/Dashboard/Muscle.svg';
 
 // =================== Component =================== //
 const Dashboard = () => {
@@ -45,6 +46,38 @@ const Dashboard = () => {
   const dailyGoal = 3000; // 3000ml per day
   const [refresh, setRefresh] = useState(false);
 
+  const [score, setScore] = useState(0);
+
+  const fetchStrengthScore = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/strength/daily-score/${userId}`);
+      const { totalScore, details } = res.data;
+      setScore(totalScore);
+
+      console.clear(); // Optional: clears old logs for better visibility
+      console.log("🔥 Strength Score Breakdown 🔥");
+      console.log(`Total Score: ${totalScore}/100`);
+      console.log("📊 Metric-wise:");
+      console.log(`Protein Score: ${details.proteinScore}/20`);
+      console.log(`Water Score: ${details.waterScore}/10`);
+      console.log(`Fat Score: ${details.fatScore}/5`);
+      console.log(`Carb Score: ${details.carbScore}/10`);
+      console.log(`Workout Duration: ${details.durationPoints}/20`);
+      console.log(`Weekly Consistency Bonus: ${details.consistencyPoints}/5`);
+      console.log(`Sleep-Based Intensity: ${details.intensityPoints}/7.5`);
+      console.log(`Workout Failure Intensity: ${details.failurePoints}/7.5`);
+      console.log(`Workout Action Quality: ${details.actionPoints}/15`);
+    } catch (err) {
+      console.error("Error fetching strength score", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStrengthScore();
+    const interval = setInterval(fetchStrengthScore, 60000); // refresh every 60 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const fetchWaterEntries = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
@@ -65,6 +98,7 @@ const Dashboard = () => {
       setWaterInput(250); // reset input
       fetchWaterEntries(); // refresh
       setRefresh(prev => !prev); // <--- refetch trigger
+      setTotalSleepDuration()
     } catch (error) {
       console.error('Error adding water entry:', error);
     }
@@ -76,6 +110,7 @@ const Dashboard = () => {
       await axios.delete(`http://localhost:5000/api/water/delete/${userId}/${entryId}`);
       fetchWaterEntries(); // refresh
       setRefresh(prev => !prev); // <--- refetch trigger
+      setTotalSleepDuration()
     } catch (error) {
       console.error('Error deleting entry:', error);
     }
@@ -328,6 +363,7 @@ const Dashboard = () => {
       setShowTimer(false);
       setStartDateTime(null);
       setElapsedTime(0);
+      fetchSleepEntries(); // ✅ Refresh after timer stops
     } catch (error) {
       console.error("Error stopping sleep:", error);
     }
@@ -344,12 +380,14 @@ const Dashboard = () => {
     try {
       const value = parseInt(durationValue);
       if (isNaN(value) || value <= 0) return;
+      const end = new Date().toISOString();
 
       const durationInSeconds = durationUnit === "hours" ? value * 3600 : value * 60;
 
       await axios.post("http://localhost:5000/api/sleep/manual", {
         userId,
         duration: durationInSeconds,
+        endDateTime: end,
       });
 
       setDurationValue("");
@@ -377,12 +415,20 @@ const Dashboard = () => {
   const fetchSleepEntries = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/sleep/entries/${userId}`);
-      console.log("Fetched entries:", res.data.entries); // 👈 add this
-      setSleepEntries(res.data.entries);
+      const entries = res.data.entries || [];
+
+      console.log("Fetched entries:", entries);
+
+      setSleepEntries(entries);
+
+      // ✅ Calculate total duration from all entries
+      const total = entries.reduce((sum, entry) => sum + (entry.totalDuration || 0), 0);
+      setTotalSleepDuration(total); // 👈 this updates your UI
     } catch (error) {
       console.error("Error fetching sleep entries:", error);
     }
   };
+
 
   useEffect(() => {
     if (userId) {
@@ -400,23 +446,58 @@ const Dashboard = () => {
     <div className="dashboard">
       <AuthorNavbar />
 
-      {/* --- Calories and Workout --- */}
+      <div className="strengthCalculator">
+        <div className="labelCont">
+          <Sparkles color="#5ba2fe" size={"16px"} />
+          <span>Body Overall Growth</span>
+        </div>
+
+        <div className="progressMuscleBar">
+          <div className="progressValue">
+            <span>{score} <span style={{ fontSize: '12px' }}>/ 100</span></span>
+          </div>
+          <div className="progress">
+            <motion.div
+              className="progressFill"
+              initial={{ width: 0 }}
+              animate={{ width: `${score}%` }}
+              transition={{ duration: 1.2, ease: "easeInOut" }}
+            />
+          </div>
+          {/* <div className="progressIcon">
+            <img src={Muscle} alt="Muscle Icon" />
+          </div> */}
+        </div>
+
+        <div className="progressInfo">
+          <span>Less Growth  50%</span>
+          <span>Balanced  50%</span>
+          <span>Stronger  80%</span>
+          <span>Strongest  100%</span>
+        </div>
+
+        <div className="note">
+          <BadgeInfo size="24px" />
+          <span>We use your Nutritional intake, Workout reps & failures to measure this metric</span>
+        </div>
+      </div>
+
       <motion.div className="otherMetrics" initial="hidden" animate="visible" variants={popInEffect}>
         {/* Calories */}
         <div className="dietCalories">
           <div className="labelCont">
             <img src={foodTrack} alt="Food track" />
-            <span>Total<br /> Calories</span>
+            <span>Calories Intake</span>
           </div>
           <div className="showValues">
             <span className="value">{totalCalories}</span>
             <span className="valueLabel">Kcal</span>
           </div>
           <div className="quickActions">
-            <button className="toggleButton" onClick={() => navigate("/log-diet")}>
+            <button className="primarySmallButton" onClick={() => navigate("/log-diet")}>
               <img src={Quick} alt="Quick log" />
             </button>
-            <button className="toggleButton" onClick={() => navigate("/diet-tracker")}>
+            <button className="primarySmallButton" onClick={() => navigate("/diet-tracker")}>
               <img src={Proceed} alt="Proceed to diet tracker" />
             </button>
           </div>
@@ -426,17 +507,17 @@ const Dashboard = () => {
         <div className="workoutDuration">
           <div className="labelCont">
             <img src={workoutSession} alt="Workout track" />
-            <span>Total<br />Workout Duration</span>
+            <span>Workout Session</span>
           </div>
           <div className="showValues">
             <span className="value">{totalDuration}</span>
             <span className="valueLabel">Minutes</span>
           </div>
           <div className="quickActions">
-            <button className="toggleButton" onClick={() => navigate("/loglive-workout")}>
+            <button className="primarySmallButton" onClick={() => navigate("/loglive-workout")}>
               <img src={Quick} alt="Quick log workout" />
             </button>
-            <button className="toggleButton" onClick={() => navigate("/workout")}>
+            <button className="primarySmallButton" onClick={() => navigate("/workout")}>
               <img src={Proceed} alt="Proceed to workout tracker" />
             </button>
           </div>
@@ -445,7 +526,7 @@ const Dashboard = () => {
 
       <div className="waterTrack">
         <div className="labelCont">
-          <img src={Sleep} alt="sleep" />
+          <Droplets color="#5ba2fe" size={"24px"} />
           <span>Water Tracker</span>
         </div>
 
@@ -462,33 +543,45 @@ const Dashboard = () => {
 
 
           <div className="waterActions">
-            <div className="note">
-              <span>Hydrate to Fresh mind and skin</span>
-            </div>
+
 
             <div className="waterInput">
-              <input
-                type="number"
-                value={waterInput}
-                onChange={(e) => setWaterInput(e.target.value)}
-              />
-              <span>ml</span>
-              <button onClick={handleAddWater}>Add</button>
+              <span>Add Water Intake (ml)</span>
+              <div className="inputAdd">
+                <input
+                  type="number"
+                  value={waterInput}
+                  onChange={(e) => setWaterInput(e.target.value)}
+                />
+                <button onClick={handleAddWater}><CirclePlus color="white" /></button>
+              </div>
+
             </div>
 
             <div className="waterHistory">
-              {waterHistory.length === 0 ? (
-                <span>No water entries for today.</span>
-              ) : (
-                waterHistory.map((entry) => (
-                  <div key={entry._id} className="entryRow">
-                    <span>{entry.waterContent} ml</span>
-                    <button onClick={() => handleDeleteEntry(entry._id)}>🗑</button>
-                  </div>
-                ))
-              )}
+              <span>History</span>
+              <div className="waterHistoryContent">
+                {waterHistory.length === 0 ? (
+                  <span>No water entries for today.</span>
+                ) : (
+                  waterHistory.map((entry) => (
+
+                    <div key={entry._id} className="entryRow">
+                      <span>{entry.waterContent} ml</span>
+                      <button onClick={() => handleDeleteEntry(entry._id)}><CircleX size={"16px"} /></button>
+                    </div>
+
+
+                  ))
+                )}
+              </div>
             </div>
           </div>
+
+        </div>
+        <div className="note">
+          <BadgeInfo size={"12px"} />
+          <span>Hydrate to fresh mind and skin</span>
         </div>
       </div>
 
@@ -501,8 +594,7 @@ const Dashboard = () => {
           </div>
 
           <div className="showTotalDuration">
-            <span style={{ color: 'black' }}>{formatSleepDuration(totalSleepDuration)}</span>
-
+            <span style={{ fontSize: '12px', borderBottom: '1px solid ' }}>{formatSleepDuration(totalSleepDuration)}</span>
           </div>
         </div>
 
@@ -510,11 +602,11 @@ const Dashboard = () => {
           {!showTimer && !showInput && (
             <>
               <motion.button onClick={handleStart} whileTap={{ scale: 0.9 }}>
-                <Hourglass />
+                <Hourglass size={"16px"} />
                 Start Timer
               </motion.button>
               <motion.button onClick={handleEnterDuration} whileTap={{ scale: 0.9 }}>
-                <CircleFadingPlus />
+                <CircleFadingPlus size={"16px"} />
                 Enter Duration
               </motion.button>
             </>
@@ -547,62 +639,72 @@ const Dashboard = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-
-
-              <input
-                type="number"
-                value={durationValue}
-                placeholder={`~ ${durationUnit}`}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "" || Number(val) >= 0) {
-                    setDurationValue(val);
-                  }
-                }}
-                min="0"
-                required
-              />
-
-              <div className="durationToggle">
-                <button
-                  className={`toggleBox ${durationUnit === "hours" ? "selected" : ""}`}
-                  onClick={() => setDurationUnit("hours")}
-                >
-                  Hrs
-                </button>
-                <button
-                  className={`toggleBox ${durationUnit === "minutes" ? "selected" : ""}`}
-                  onClick={() => setDurationUnit("minutes")}
-                >
-                  Mins
-                </button>
+              <div className="backOption" onClick={() => window.location.reload()}>
+                <MoveLeft size={"16px"} />
               </div>
+              <div className="inputAction">
+                <input
+                  type="number"
+                  value={durationValue}
+                  placeholder={`~ ${durationUnit}`}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "" || Number(val) >= 0) {
+                      setDurationValue(val);
+                    }
+                  }}
+                  min="0"
+                  required
+                />
+
+                <div className="durationToggle">
+                  <button
+                    className={`toggleBox ${durationUnit === "hours" ? "selected" : ""}`}
+                    onClick={() => setDurationUnit("hours")}
+                  >
+                    Hrs
+                  </button>
+                  <button
+                    className={`toggleBox ${durationUnit === "minutes" ? "selected" : ""}`}
+                    onClick={() => setDurationUnit("minutes")}
+                  >
+                    Mins
+                  </button>
+                </div>
 
 
+              </div>
               <motion.button onClick={handleSubmitDuration} whileTap={{ scale: 0.95 }}>
-
                 <ArrowRight color="white" />
               </motion.button>
+
+
+
+
+
             </motion.div>
           )}
 
         </AnimatePresence>
 
+        {(!showTimer && !showInput) && (
+          <div className="sleepHistory">
+            <span>History</span>
+            {sleepEntries.length === 0 && <p>No records yet.</p>}
 
-        <div className="sleepHistory">
-          {sleepEntries.length === 0 && <p>No records yet.</p>}
+            <div className="sleepEnteries">
+              {sleepEntries.map((entry) => (
+                <div className="sleepEntry" key={entry._id}>
+                  <span>{formatSleepEntryDuration(entry.totalDuration)}</span>
+                  <button onClick={() => handleDeleteSleepEntry(entry._id)}>
+                    <CircleX size={"16px"} />
+                  </button>
+                </div>
+              ))}
+            </div>
 
-          <div className="sleepEnteries">
-            {sleepEntries.map((entry) => (
-              <div className="sleepEntry" key={entry._id}>
-                <span>{formatSleepEntryDuration(entry.totalDuration)}</span>
-                <button onClick={() => handleDeleteSleepEntry(entry._id)}>
-                  <CircleX size={"16px"} />
-                </button>
-              </div>
-            ))}
           </div>
-        </div>
+        )}
 
 
       </div>
@@ -610,7 +712,7 @@ const Dashboard = () => {
       {/* --- BMI Tracker --- */}
       <div className="bmiTool">
         <div className="toolHeading">
-          <img src={BmiHeading} alt="Check BMI" />
+        <Calculator color="#5BA2FE" size={"16px"}/>
           <span>Body Mass Index (BMI)</span>
         </div>
         <div className="bmiMetric">

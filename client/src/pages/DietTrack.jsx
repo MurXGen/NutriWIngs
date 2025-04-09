@@ -258,7 +258,20 @@ const DietTrack = () => {
           </motion.div>
         </div>
         <div className="dietButtons">
-          <button onClick={() => navigate("/log-diet")} className="checkButton">
+          <button
+            onClick={() => {
+              const now = new Date();
+              const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
+
+              navigate("/log-diet", {
+                state: {
+                  date: selectedDate,
+                  time: currentTime,
+                },
+              });
+            }}
+            className="checkButton"
+          >
             Log Diet
             <CirclePlus />
           </button>

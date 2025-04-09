@@ -4,26 +4,7 @@ import WorkoutTemplates from "../components/WorkoutTemplates";
 import WorkoutHistory from "../components/WorkoutHistory";
 
 const Workout = () => {
-  const [sessionMinutes, setSessionMinutes] = useState(0);
-  const [caloriesBurned, setCaloriesBurned] = useState(0);
-  const [pastWorkouts, setPastWorkouts] = useState([]);
 
-  useEffect(() => {
-    // Fetch workout summary from API
-    const fetchWorkoutData = async () => {
-      try {
-        const res = await fetch("/api/workout/summary"); // Dummy API
-        const data = await res.json();
-        setSessionMinutes(data.sessionMinutes);
-        setCaloriesBurned(data.caloriesBurned);
-        setPastWorkouts(data.pastWorkouts);
-      } catch (error) {
-        console.error("Error fetching workouts:", error);
-      }
-    };
-
-    fetchWorkoutData();
-  }, []);
 
   return (
     <div className="workout-container">
@@ -37,11 +18,11 @@ const Workout = () => {
       <div className="summary">
         <div className="card">
           <h3>Today's Session</h3>
-          <h1>{sessionMinutes} Mins</h1>
+
         </div>
         <div className="card">
           <h3>Calories Burned</h3>
-          <h1>{caloriesBurned} Kcal</h1>
+
         </div>
       </div>
 
@@ -69,7 +50,7 @@ const Workout = () => {
       {/* past workout to be shown later */}
 
       {/* <WorkoutTemplates/> */}
-      <WorkoutHistory/>
+      <WorkoutHistory />
     </div>
   );
 };

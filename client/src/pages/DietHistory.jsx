@@ -20,31 +20,32 @@ const DietHistory = () => {
       try {
         const userId = localStorage.getItem("userId");
         if (!userId) throw new Error("User ID not found. Please log in again.");
-
+  
         const response = await fetch(`http://localhost:5000/api/diet/history?userId=${userId}`);
         if (!response.ok) throw new Error("Failed to fetch diet history");
-
+  
         const data = await response.json();
         setHistory(data);
-
+  
         const todayKey = new Date().toLocaleDateString("en-CA");
-        if (data.some((entry) => entry.Date === todayKey)) {
-          setSelectedDate(todayKey);
-          setTotalCalories(
-            data
-              .filter((entry) => entry.Date === todayKey)
-              .reduce((sum, entry) => sum + (entry.DietTaken?.CaloriesTaken || 0), 0)
-          );
-        }
+        setSelectedDate(todayKey); // ✅ Always mark today's date as selected
+        const todayEntries = data.filter((entry) => entry.Date === todayKey);
+        const total = todayEntries.reduce(
+          (sum, entry) => sum + (entry.DietTaken?.CaloriesTaken || 0),
+          0
+        );
+        setTotalCalories(total);
+  
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchHistory();
   }, []);
+  
 
   const handleMonthChange = (offset) => {
     const newMonth = new Date(currentMonth);
@@ -72,6 +73,39 @@ const DietHistory = () => {
     if (!dietId) return;
     navigate(`/log-diet?dietId=${dietId}`); // Pass dietId as query param
   };
+
+  const handleDelete = async (dietId) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId || !dietId) return;
+  
+    try {
+      // Send delete request
+      const res = await fetch(`http://localhost:5000/api/diet/delete/${userId}/${dietId}`, {
+        method: "DELETE",
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete diet entry");
+  
+      // Fetch updated history after deletion
+      const updatedResponse = await fetch(`http://localhost:5000/api/diet/history?userId=${userId}`);
+      if (!updatedResponse.ok) throw new Error("Failed to fetch updated diet history");
+  
+      const updatedData = await updatedResponse.json();
+      setHistory(updatedData);
+  
+      // Refresh selected date's total calories
+      if (selectedDate) {
+        const total = updatedData
+          .filter((entry) => entry.Date === selectedDate)
+          .reduce((sum, entry) => sum + (entry.DietTaken?.CaloriesTaken || 0), 0);
+        setTotalCalories(total);
+      }
+  
+    } catch (error) {
+      console.error("Error deleting diet entry:", error);
+    }
+  };
+  
   
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
@@ -106,7 +140,7 @@ const DietHistory = () => {
       </div>
 
       {/* Sliding Calendar View */}
-      <motion.div className="calenderView" initial={{ height: 0, opacity: 0 }} animate={{ height: showCalendar ? "auto" : 0, opacity: showCalendar ? 1 : 0 }} transition={{ duration: 0.5 }} style={{ overflow: "hidden" }}>
+      <motion.div className="calenderView" initial={{ height: 0, opacity: 0 }} animate={{ height: showCalendar ? 0 : "auto" , opacity: showCalendar ? 0 : 1 }} transition={{ duration: 0.5 }} style={{ overflow: "hidden" }}>
         
         {/* Days of the week header */}
         <div className="daysHeader">

@@ -4,49 +4,67 @@ const mongoose = require("mongoose");
 
 exports.getDailyMetrics = async (req, res) => {
   try {
-    const userId = req.cookies.userId; // Extract user ID from cookies
+    const userId = req.cookies.userId;
+    console.log("User ID from cookie:", userId);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    // Get current date (YYYY-MM-DD format)
-    const today = new Date().toISOString().split("T")[0];
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
-    // Fetch user's total calories intake for today
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      console.log("❌ No user found with ID:", userId);
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    const todayCalories = user.healthDiets
-      .filter((diet) => diet.Date === today && diet.DietTaken)
-      .reduce((total, diet) => total + (diet.DietTaken.CaloriesTaken || 0), 0);
+    // 🍽️ CALORIES
+    const todayDiets = user.healthDiets.filter(diet => {
+      const dietDate = new Date(diet.Date);
+      return dietDate >= startOfDay && dietDate <= endOfDay && diet.DietTaken;
+    });
 
-    // Fetch user's total workout duration for today
-    const workoutData = await Workout.findOne({
+    const todayCalories = todayDiets.reduce((total, diet) => {
+      return total + (diet.DietTaken.CaloriesTaken || 0);
+    }, 0);
+
+    // 🏋️ WORKOUT DURATION
+    const workouts = await Workout.find({
       userId: new mongoose.Types.ObjectId(userId),
-      date: {
-        $gte: new Date(today),
-        $lt: new Date(new Date(today).setDate(new Date(today).getDate() + 1)),
+      startTime: {
+        $gte: startOfDay,
+        $lte: endOfDay,
       },
     });
 
-    const todayWorkoutDurationSeconds = workoutData
-      ? workoutData.workouts.reduce(
-        (total, workout) => total + (workout.duration || 0),
-        0
-      )
-      : 0;
+    console.log("🏋️ All Workouts Today:", workouts);
 
-    const todayWorkoutDurationMinutes = (
-      todayWorkoutDurationSeconds / 60
-    );
+    // Sum all top-level durations (already in seconds)
+    const totalWorkoutDurationSeconds = workouts.reduce((sum, doc) => {
+      return sum + (doc.duration || 0);
+    }, 0);
+
+    const totalWorkoutDurationMinutes = totalWorkoutDurationSeconds / 60;
+
+    // Format results
+    const formattedCalories = Number(todayCalories.toFixed(1));
+    const formattedDuration = Number(totalWorkoutDurationMinutes.toFixed(2));
+
+    console.log("🔥 Calories Taken Today:", formattedCalories);
+    console.log("🏋️ Total Workout Duration (min):", formattedDuration);
 
     res.json({
-      totalCalories: todayCalories,
-      totalDuration: todayWorkoutDurationMinutes,
+      totalCalories: formattedCalories,
+      totalDuration: formattedDuration,
     });
   } catch (error) {
-    console.error("Error fetching metrics:", error);
+    console.error("❌ Error fetching metrics:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
 
 // Start sleep
 exports.startSleep = async (req, res) => {
@@ -129,7 +147,7 @@ exports.stopSleep = async (req, res) => {
 
 // Manual entry
 exports.manualSleepEntry = async (req, res) => {
-  const { userId, duration } = req.body;
+  const { userId, duration, endDateTime } = req.body;
 
   console.log("✍️ Manual Sleep Entry Triggered");
   console.log("📦 Request Body:", req.body);
@@ -143,9 +161,8 @@ exports.manualSleepEntry = async (req, res) => {
 
     user.recoveryFactors.sleepTrack.push({
       startDateTime: null,
-      endDateTime: null,
+      endDateTime: endDateTime,
       totalDuration: duration,
-      createdAt: new Date(),
     });
 
     await user.save();
@@ -294,6 +311,8 @@ exports.getTodaysSleepEntries = async (req, res) => {
 
 
 
+
+
 exports.addWaterEntry = async (req, res) => {
   const { userId } = req.params;
   const { waterContent } = req.body;
@@ -356,4 +375,172 @@ exports.deleteWaterEntry = async (req, res) => {
     res.status(500).json({ error: 'Failed to delete entry' });
   }
 };
+
+exports.calculateStrengthScore = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const { healthDetails, healthDiets, recoveryFactors } = user;
+    const { weight, RecomCal } = healthDetails;
+
+    // ======== NUTRITION ========
+    const todayDiets = healthDiets.filter(d => {
+      const dietDate = new Date(d.Date);
+      return dietDate >= startOfDay && dietDate <= endOfDay;
+    });
+
+    let totalProtein = 0, totalCarbs = 0, totalFats = 0;
+    todayDiets.forEach(d => {
+      if (d.DietTaken) {
+        totalProtein += d.DietTaken.Protein || 0;
+        totalCarbs += d.DietTaken.Carbs || 0;
+        totalFats += d.DietTaken.Fats || 0;
+      }
+    });
+
+    const totalCals = (totalProtein * 4) + (totalCarbs * 4) + (totalFats * 9);
+    const proteinTarget = weight;
+
+    // ======== WATER INTAKE ========
+    const waterIntakeToday = recoveryFactors?.waterIntake?.filter(w =>
+      new Date(w.recordDateTime) >= startOfDay && new Date(w.recordDateTime) <= endOfDay
+    ).reduce((sum, w) => sum + w.waterContent, 0) || 0;
+
+    // ======== SLEEP ========
+    const sleepToday = recoveryFactors?.sleepTrack?.filter(s => {
+      const hasDuration = s.totalDuration && s.totalDuration > 0;
+
+      const endDate = s.endDateTime ? new Date(s.endDateTime) : null;
+      const startDate = s.startDateTime ? new Date(s.startDateTime) : null;
+
+      const isEndToday = endDate && endDate >= startOfDay && endDate <= endOfDay;
+      const isStartToday = startDate && startDate >= startOfDay && startDate <= endOfDay;
+
+      return hasDuration && (isEndToday || isStartToday);
+    });
+
+    const totalSleepSecs = sleepToday.reduce((sum, s) => sum + (s.totalDuration || 0), 0);
+    const sleepHours = totalSleepSecs / 3600;
+
+
+    // ======== WORKOUTS ========
+    const todayWorkout = await Workout.find({
+      userId,
+      startTime: { $gte: startOfDay, $lte: endOfDay }
+    });
+
+    const weeklyWorkouts = await Workout.find({
+      userId,
+      startTime: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+    });
+
+    // ======== Workout Duration Score - 25 pts ========
+    const totalTodayDurationSecs = todayWorkout.reduce((sum, w) => sum + (w.duration || 0), 0);
+    const workoutDurationMins = totalTodayDurationSecs / 60;
+    const durationPoints = Math.min((workoutDurationMins / 60) * 20, 20); // Max 20 pts
+
+    const totalWeeklyDurationSecs = weeklyWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0);
+    const weeklyTotalDurationMins = totalWeeklyDurationSecs / 60;
+    const consistencyPoints = weeklyTotalDurationMins >= 210 ? 5 : 0;
+
+    // ======== Intensity Score - 15 pts ========
+    const intensitySleep = Math.min(sleepHours, 8);
+    const intensityPoints = (intensitySleep / 8) * 7.5;
+
+    let totalFailures = 0;
+
+    todayWorkout.forEach(w => {
+      w.workouts?.forEach(wo => {
+        const actions = wo.actions ? [...wo.actions.values()] : [];
+        actions.forEach(a => {
+          if (a.failure === "yes") totalFailures++;
+        });
+      });
+    });
+
+    const cappedFailures = Math.min(totalFailures, 4); // Cap to 4
+    const failurePoints = (cappedFailures / 4) * 7.5;
+
+    // ======== Action Quality Score - 15 pts ========
+    let todaysReps = 0, todaysWeight = 0, avgTodayWeight = 0;
+    let lastWorkoutWeight = 0;
+    let mainCategory = "";
+
+    // Analyze today's data
+    todayWorkout.forEach(w => {
+      w.workouts.forEach(wo => {
+        mainCategory = wo.category;
+        [...(wo.actions?.values() || [])].forEach(action => {
+          todaysReps += action.reps || 0;
+          todaysWeight += action.weight || 0;
+        });
+      });
+    });
+
+    avgTodayWeight = todaysReps > 0 ? todaysWeight / todaysReps : 0;
+
+    // Get last same-category workout in the week
+    const lastSimilarWorkout = weeklyWorkouts.reverse().find(w =>
+      w.workouts.some(wo => wo.category === mainCategory)
+    );
+
+    if (lastSimilarWorkout) {
+      const matched = lastSimilarWorkout.workouts.find(wo => wo.category === mainCategory);
+      if (matched) {
+        const actions = [...(matched.actions?.values() || [])];
+        lastWorkoutWeight = actions.length > 0
+          ? actions.reduce((sum, a) => sum + (a.weight || 0), 0) / actions.length
+          : 0;
+      }
+    }
+
+    let actionPoints = 0;
+
+    const repsPoints = Math.min((todaysReps / 315) * 7.5, 7.5); // Proportional up to 315 reps
+    actionPoints = repsPoints;
+
+    if (avgTodayWeight >= lastWorkoutWeight) {
+      actionPoints *= 2; // Double the action quality points
+    }
+
+    actionPoints = Math.min(actionPoints, 15); // Cap to 15
+
+    // ======== Nutrition Score - 45 pts ========
+    const proteinScore = Math.min((totalProtein / proteinTarget) * 20, 20);
+    const waterScore = Math.min((waterIntakeToday / 3000) * 10, 10);
+    const fatScore = (totalCals && (totalFats * 9 / totalCals <= 0.3)) ? 5 : 0;
+    const carbScore = (totalCals && (totalCarbs * 4 / totalCals <= 0.5)) ? 10 : 0;
+
+    // ======== Final Score ========
+    const totalScore = proteinScore + waterScore + fatScore + carbScore +
+      durationPoints + consistencyPoints +
+      intensityPoints + failurePoints + actionPoints;
+
+    res.status(200).json({
+      totalScore: Number(Math.min(totalScore, 100).toFixed(1)),
+      details: {
+        proteinScore: Number(proteinScore.toFixed(1)),
+        waterScore: Number(waterScore.toFixed(1)),
+        fatScore: Number(fatScore.toFixed(1)),
+        carbScore: Number(carbScore.toFixed(1)),
+        durationPoints: Number(durationPoints.toFixed(1)),
+        consistencyPoints: Number(consistencyPoints.toFixed(1)),
+        intensityPoints: Number(intensityPoints.toFixed(1)),
+        failurePoints: Number(failurePoints.toFixed(1)),
+        actionPoints: Number(actionPoints.toFixed(1)),
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 
