@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const userId = localStorage.getItem("userId"); // ✅ Check userId from localStorage
-  console.log("ProtectedRoute Check - Authenticated:", userId ? true : false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
 
-  return userId ? <Outlet /> : <Navigate to="/welcome" />;
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    setIsAuthenticated(!!userId); // true if userId exists
+  }, []);
+
+  if (isAuthenticated === null) return null; // or a loader
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/welcome" />;
 };
 
 export default ProtectedRoute;
