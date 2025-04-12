@@ -29,51 +29,45 @@ exports.saveWorkout = async (req, res) => {
   }
 };
 
+
+
 exports.getWorkoutHistory = async (req, res) => {
   try {
     const { userId } = req.cookies;
-    console.log("User ID from cookies:", userId); // Debugging user ID
 
     if (!userId) {
-      console.log("Unauthorized request: No user ID found");
       return res.status(401).json({ message: "Unauthorized: No user ID found" });
     }
 
-    // Convert to Indian Standard Time (UTC+5:30)
-    const now = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
-    const istTime = new Date(now.getTime() + istOffset);
+    const workoutRecords = await Workout.find({ userId }).sort({ startTime: -1 });
 
-    // Get start and end of the IST day
-    const startOfDayIST = new Date(istTime);
-    startOfDayIST.setHours(0, 0, 0, 0);
+    const groupedByDate = {};
 
-    const endOfDayIST = new Date(istTime);
-    endOfDayIST.setHours(23, 59, 59, 999);
+    workoutRecords.forEach((record) => {
+      const dateKey = new Date(record.startTime).toDateString();
 
-    // Convert back to UTC for MongoDB query
-    const startUTC = new Date(startOfDayIST.getTime() - istOffset);
-    const endUTC = new Date(endOfDayIST.getTime() - istOffset);
+      if (!groupedByDate[dateKey]) {
+        groupedByDate[dateKey] = {
+          date: record.startTime,
+          duration: 0,
+          workouts: [],
+        };
+      }
 
-    // Fetch only today’s workouts (based on IST)
-    const workoutRecords = await Workout.find({
-      userId,
-      startTime: { $gte: startUTC, $lte: endUTC },
-    }).select("workouts startTime duration");
+      groupedByDate[dateKey].duration += record.duration;
+      groupedByDate[dateKey].workouts.push(
+        ...record.workouts.map((w) => ({
+          imageUrl: w.imageUrl,
+          workoutName: w.workoutName,
+          category: w.category,
+          actions: w.actions,
+        }))
+      );
+    });
 
-    console.log("Fetched workout records from DB:", workoutRecords);
-
-    const formattedWorkouts = workoutRecords.map((record) => ({
-      duration: record.duration,
-      date: record.startTime,
-      workouts: record.workouts.map((w) => ({
-        workoutName: w.workoutName,
-        category: w.category,
-        actions: w.actions,
-      })),
-    }));
-
-    console.log("Formatted Workouts to send:", formattedWorkouts);
+    const formattedWorkouts = Object.values(groupedByDate).sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
 
     res.status(200).json(formattedWorkouts);
   } catch (error) {
@@ -82,6 +76,7 @@ exports.getWorkoutHistory = async (req, res) => {
   }
 };
 
+
 exports.updateWorkoutAction = async (req, res) => {
   try {
     const { userId } = req.cookies;
@@ -89,9 +84,13 @@ exports.updateWorkoutAction = async (req, res) => {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
+    const inputDate = new Date(date);
+    const startOfDay = new Date(inputDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(inputDate.setHours(23, 59, 59, 999));
+
     const workoutDoc = await Workout.findOne({
       userId,
-      startTime: new Date(date),
+      startTime: { $gte: startOfDay, $lte: endOfDay },
       "workouts.workoutName": workoutName,
     });
 
@@ -111,6 +110,7 @@ exports.updateWorkoutAction = async (req, res) => {
   }
 };
 
+
 exports.deleteSingleWorkoutAction = async (req, res) => {
   try {
     const { userId } = req.cookies;
@@ -118,19 +118,23 @@ exports.deleteSingleWorkoutAction = async (req, res) => {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
+    const inputDate = new Date(workout.date);
+    const startOfDay = new Date(inputDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(inputDate.setHours(23, 59, 59, 999));
+
     const workoutDoc = await Workout.findOne({
       userId,
-      startTime: new Date(workout.date),
+      startTime: { $gte: startOfDay, $lte: endOfDay },
       "workouts.workoutName": workout.workoutName,
     });
 
     if (!workoutDoc) return res.status(404).json({ message: "Workout not found" });
 
     const workoutToEdit = workoutDoc.workouts.find(w => w.workoutName === workout.workoutName);
-    
+
     if (workoutToEdit && workoutToEdit.actions.has(setKey)) {
       workoutToEdit.actions.delete(setKey);
-      workoutDoc.markModified("workouts"); // 🔥 this makes sure Mongoose picks up the change
+      workoutDoc.markModified("workouts");
       await workoutDoc.save();
       return res.status(200).json({ message: "Workout set deleted successfully" });
     }
@@ -142,29 +146,34 @@ exports.deleteSingleWorkoutAction = async (req, res) => {
   }
 };
 
-// controllers/workoutController.js
+
 exports.deleteWorkoutSession = async (req, res) => {
   try {
     const { userId } = req.cookies;
-    const { date } = req.body; // date = startTime of the session
+    const { date } = req.body;
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const deleted = await Workout.findOneAndDelete({
+    const inputDate = new Date(date);
+    const startOfDay = new Date(inputDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(inputDate.setHours(23, 59, 59, 999));
+
+    const deleted = await Workout.deleteMany({
       userId,
-      startTime: new Date(date),
+      startTime: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    if (!deleted) {
+    if (deleted.deletedCount === 0) {
       return res.status(404).json({ message: "Workout session not found" });
     }
 
-    res.status(200).json({ message: "Workout session deleted successfully" });
+    res.status(200).json({ message: "Workout session(s) deleted successfully" });
   } catch (error) {
     console.error("Error deleting workout session:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import RegisterNavbar from '../components/Navbar';
 import { User, HeartPulse } from 'lucide-react';
+import BottomNavBar from "../components/BottomNavBar";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -177,6 +178,7 @@ const Profile = () => {
           <button className="checkButton" onClick={handleLogout}>Logout</button>
         </div>
       </div>
+      <BottomNavBar/>
     </div>
   );
 };

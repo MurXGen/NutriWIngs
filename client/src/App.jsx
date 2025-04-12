@@ -10,6 +10,8 @@ import DietHistory from "./pages/DietHistory";
 import Welcome from "./pages/Welcome";
 import Workout from "./pages/Workout";
 import LiveWorkout from "./pages/LiveWorkout";
+import WorkoutHistoryPage from "./pages/WorkoutHistoryPage";
+import StrengthMetrics from "./pages/StrengthMetrics";
 
 const App = () => {
   return (
@@ -27,7 +29,8 @@ const App = () => {
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/workout" element={<Workout />} />
         <Route path="/loglive-workout" element={<LiveWorkout />} />
-
+        <Route path="/workout-history" element={< WorkoutHistoryPage/>} />
+        <Route path="/strength-metrics" element={< StrengthMetrics/>} />
 
       </Route>
     </Routes>

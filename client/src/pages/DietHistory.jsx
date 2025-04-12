@@ -4,6 +4,7 @@ import clickSound from "../assets/click.mp3";
 import "../DietHistoryCalender.css";
 import { useNavigate } from "react-router-dom";
 import AuthorNavbar from '../components/AuthorNavbar'
+import { Calendar, Edit, OctagonX } from "lucide-react";
 
 const DietHistory = () => {
   const [history, setHistory] = useState([]);
@@ -13,6 +14,8 @@ const DietHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [recomCal, setRecomCal] = useState(2000); // Default value
+  const [dailyCalories, setDailyCalories] = useState({}); // { date: totalCalories }
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,32 +23,63 @@ const DietHistory = () => {
       try {
         const userId = localStorage.getItem("userId");
         if (!userId) throw new Error("User ID not found. Please log in again.");
-  
+
+        // Fetch diet history for the user
         const response = await fetch(`http://localhost:5000/api/diet/history?userId=${userId}`);
         if (!response.ok) throw new Error("Failed to fetch diet history");
-  
         const data = await response.json();
         setHistory(data);
-  
+
+        // Fetch RecomCal from the new API
+        const recomCalResponse = await fetch(`http://localhost:5000/api/diet/recomcal?userId=${userId}`);
+        if (recomCalResponse.ok) {
+          const recomCalData = await recomCalResponse.json();
+          // Check if RecomCal is fetched correctly
+          console.log("Fetched RecomCal:", recomCalData);
+
+          if (recomCalData.success) {
+            setRecomCal(recomCalData.recomCal); // Set RecomCal from the response
+          } else {
+            setRecomCal(2000); // Default value if RecomCal is not fetched properly
+          }
+        } else {
+          throw new Error("Failed to fetch RecomCal");
+        }
+
+        // Calculate daily calories
+        const dailyCal = {};
+        data.forEach(entry => {
+          if (!dailyCal[entry.Date]) {
+            dailyCal[entry.Date] = 0;
+          }
+          dailyCal[entry.Date] += entry.DietTaken?.CaloriesTaken || 0;
+        });
+        setDailyCalories(dailyCal);
+
+        // Set the default selected date as today
         const todayKey = new Date().toLocaleDateString("en-CA");
-        setSelectedDate(todayKey); // ✅ Always mark today's date as selected
-        const todayEntries = data.filter((entry) => entry.Date === todayKey);
-        const total = todayEntries.reduce(
-          (sum, entry) => sum + (entry.DietTaken?.CaloriesTaken || 0),
-          0
-        );
-        setTotalCalories(total);
-  
+        setSelectedDate(todayKey);
+        setTotalCalories(dailyCal[todayKey] || 0);
+
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchHistory();
   }, []);
-  
+
+
+  const getDateColor = (dateKey) => {
+    const calories = dailyCalories[dateKey] || 0;
+    if (calories === 0) return '#5ba2fe20';
+    if (calories > recomCal) return '#ff9966';
+    if (calories < recomCal) return '#66cc99';
+    return '#99ccff';
+  };
+
 
   const handleMonthChange = (offset) => {
     const newMonth = new Date(currentMonth);
@@ -62,7 +96,7 @@ const DietHistory = () => {
 
     const audio = new Audio(clickSound);
     audio.play();
-  
+
     setTimeout(() => {
       audio.pause();
       audio.currentTime = 0;
@@ -77,22 +111,22 @@ const DietHistory = () => {
   const handleDelete = async (dietId) => {
     const userId = localStorage.getItem("userId");
     if (!userId || !dietId) return;
-  
+
     try {
       // Send delete request
       const res = await fetch(`http://localhost:5000/api/diet/delete/${userId}/${dietId}`, {
         method: "DELETE",
       });
-  
+
       if (!res.ok) throw new Error("Failed to delete diet entry");
-  
+
       // Fetch updated history after deletion
       const updatedResponse = await fetch(`http://localhost:5000/api/diet/history?userId=${userId}`);
       if (!updatedResponse.ok) throw new Error("Failed to fetch updated diet history");
-  
+
       const updatedData = await updatedResponse.json();
       setHistory(updatedData);
-  
+
       // Refresh selected date's total calories
       if (selectedDate) {
         const total = updatedData
@@ -100,13 +134,13 @@ const DietHistory = () => {
           .reduce((sum, entry) => sum + (entry.DietTaken?.CaloriesTaken || 0), 0);
         setTotalCalories(total);
       }
-  
+
     } catch (error) {
       console.error("Error deleting diet entry:", error);
     }
   };
-  
-  
+
+
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayIndex = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay(); // 0 for Sun, 1 for Mon...
@@ -117,31 +151,31 @@ const DietHistory = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    
+
     <motion.div className="dietHistory" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}>
       <div className="pageNavigation">
 
-      <button onClick={() => navigate("/diet-tracker")}>{"<"}</button>
-      <span>Diet History</span>
+        <button onClick={() => navigate("/diet-tracker")}>{"<"}</button>
+        <span>Diet History</span>
 
-              
+
       </div>
 
       {/* Month Navigation */}
-      <div style={{display:'flex',gap:'12px',flexDirection:'column'}} onClick={() => setShowCalendar((prev) => !prev)}>
-        <div  className="monthNav">
-        <button onClick={() => handleMonthChange(-1)}>{"<"}</button>
-        <span className="monthText" style={{ cursor: "pointer", fontWeight: "bold" }}>
-          {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-        </span>
-        {isCurrentMonthBeforeToday && <button onClick={() => handleMonthChange(1)}>{">"}</button>}
+      <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
+        <div className="monthNav">
+          <button onClick={() => handleMonthChange(-1)}>{"<"}</button>
+          <span className="monthText" style={{ cursor: "pointer", fontWeight: "bold" }}>
+            {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+          </span>
+          {isCurrentMonthBeforeToday && <button onClick={() => handleMonthChange(1)}>{">"}</button>}
         </div>
-        <span className="monthArrow">↓</span>
+        <span className="monthArrow" onClick={() => setShowCalendar((prev) => !prev)}>↓</span>
       </div>
 
       {/* Sliding Calendar View */}
-      <motion.div className="calenderView" initial={{ height: 0, opacity: 0 }} animate={{ height: showCalendar ? 0 : "auto" , opacity: showCalendar ? 0 : 1 }} transition={{ duration: 0.5 }} style={{ overflow: "hidden" }}>
-        
+      <motion.div className="calenderView" initial={{ height: 0, opacity: 0 }} animate={{ height: showCalendar ? 0 : "auto", opacity: showCalendar ? 0 : 1 }} transition={{ duration: 0.5 }} style={{ overflow: "hidden" }}>
+
         {/* Days of the week header */}
         <div className="daysHeader">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
@@ -161,21 +195,24 @@ const DietHistory = () => {
             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), index + 1);
             const dateKey = date.toLocaleDateString("en-CA");
             const isPastOrToday = date <= today;
+            const dateColor = getDateColor(dateKey);
+            const isSelected = selectedDate === dateKey;
 
             return (
               <motion.button
                 key={dateKey}
                 onClick={() => isPastOrToday && handleDateChange(date)}
-                whileTap={{ scale: 0.9, backgroundColor: "#5ba2fe10" }}
+                whileTap={{ scale: 0.9 }}
                 style={{
                   padding: "15px",
                   borderRadius: "8px",
-                  backgroundColor: selectedDate === dateKey ? "rgb(91, 162, 254)" : "#5ba2fe21",
-                  color: selectedDate === dateKey ? "white" : "black",
-                  border: "none",
+                  backgroundColor: isSelected ? "rgb(91, 162, 254)" : dateColor,
+                  color: isSelected ? "white" : "black",
+                  border: isSelected ? "2px solid white" : "none",
                   cursor: isPastOrToday ? "pointer" : "not-allowed",
-                  fontSize:'12px',
-                  placeItems:'center'
+                  fontSize: '12px',
+                  placeItems: 'center',
+                  margin: '2px'
                 }}
                 disabled={!isPastOrToday}
               >
@@ -187,63 +224,72 @@ const DietHistory = () => {
       </motion.div>
 
       {/* Diet Details */}
-     {/* Diet Details */}
-     {selectedDate && (
-  <motion.div 
-    className="diet-details" 
-    initial={{ opacity: 0, y: 20 }} 
-    animate={{ opacity: 1, y: 0 }} 
-    transition={{ duration: 0.5 }} 
-    style={{ marginTop: "20px" }}
-  >
-    <h3>{selectedDate} - Total Calories: {totalCalories.toFixed(1)} kcal</h3>
+      {selectedDate && (
+        <motion.div
+          className="diet-details"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ marginTop: "20px" }}
+        >
+          <span className="dietHistoryLabel">
+            <span className="calorieDate"><Calendar color="#5ba2fe" size={16} />{selectedDate}</span>
+            <span className="caloreValue">{totalCalories.toFixed(1)} kcal</span>
+          </span>
 
-    {history
-  .filter((entry) => entry.Date === selectedDate)
-  .map((entry) => (
-    <motion.div 
-      key={entry.DietID} 
-      initial={{ opacity: 0, x: -10 }} 
-      animate={{ opacity: 1, x: 0 }} 
-      transition={{ duration: 0.3, delay: 0.1 }} 
-      style={{ padding: "10px", borderBottom: "1px solid #ddd", position: "relative" }}
-    >
-      <p><strong>Food:</strong> {entry.FoodName}</p>
-      <p><strong>Portion Taken:</strong> {entry.DietTaken?.PortionSizeTaken?.toFixed(1) || "0"} g</p>
-      <p><strong>Carbs:</strong> {entry.DietTaken?.Carbs?.toFixed(1) || "0"} g</p>
-      <p><strong>Protein:</strong> {entry.DietTaken?.Protein?.toFixed(1) || "0"} g</p>
-      <p><strong>Fats:</strong> {entry.DietTaken?.Fats?.toFixed(1) || "0"} g</p>
+          {history
+            .filter((entry) => entry.Date === selectedDate)
+            .map((entry) => (
+              <motion.div
+                key={entry.DietID}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className="dietList"
+              >
+                <div className="dietListImg">
+                  {entry.ImageUrl && (
+                    <img
+                      src={entry.ImageUrl}
+                      alt={entry.FoodName}
+                      style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", marginTop: "10px" }}
+                    />
+                  )}
+                </div>
 
-      {/* Display Image if Available */}
-      {entry.ImageUrl && (
-        <img 
-          src={entry.ImageUrl} 
-          alt={entry.FoodName} 
-          style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "8px", marginTop: "10px" }}
-        />
+                <div className="dietListContent">
+                  <div className="foodName">
+                    <span><strong>Food :</strong> {entry.FoodName}</span>
+                    <span style={{ fontSize: '12px' }}>{entry.DietTaken?.PortionSizeTaken?.toFixed(1) || "0"} g</span>
+                  </div>
+                  <div className="foodNutritions">
+                    <span><strong style={{ color: "rgb(188 169 0)" }}>Carbs:</strong> {entry.DietTaken?.Carbs?.toFixed(1) || "0"} g</span>
+                    <span><strong style={{ color: "rgb(0 157 5)" }}>Protein:</strong> {entry.DietTaken?.Protein?.toFixed(1) || "0"} g</span>
+                    <span><strong style={{ color: "#FF8192" }}>Fats:</strong> {entry.DietTaken?.Fats?.toFixed(1) || "0"} g</span>
+                  </div>
+
+                </div>
+                <div className="actionButtons">
+                  <button
+                    onClick={() => handleEdit(entry.DietID)}
+                  >
+                    <Edit color="#5ba2fe" size={16} />
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(entry.DietID)}
+                  >
+                    <OctagonX color="#5ba2fe" size={16} />
+                  </button>
+                </div>
+
+
+              </motion.div>
+            ))}
+
+
+        </motion.div>
       )}
-
-      {/* Edit and Delete Buttons */}
-      <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-        <button 
-          onClick={() => handleEdit(entry.DietID)} 
-          style={{ background: "#5ba2fe", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
-        >
-          Edit
-        </button>
-        
-        <button 
-          onClick={() => handleDelete(entry.DietID)} 
-          style={{ background: "#ff4d4d", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
-        >
-          Delete
-        </button>
-      </div>
-    </motion.div>
-  ))}
-
-  </motion.div>
-)}
 
 
     </motion.div>

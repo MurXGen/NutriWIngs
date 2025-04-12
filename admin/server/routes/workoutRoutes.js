@@ -17,10 +17,11 @@ console.log('Cloudinary config:', cloudinary.config());
 
 const storage = new CloudinaryStorage({
   cloudinary,
- params: {
-  folder: 'nutriwings-workouts',
-  allowed_formats: ['jpg', 'jpeg', 'png'], // current
-}
+  params: {
+    folder: 'nutriwings-workouts',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+  }
+
 
 });
 

@@ -5,6 +5,7 @@ import { CirclePlus, ListTodo, Frown, Laugh } from "lucide-react";
 import { motion } from "framer-motion";
 import "../DietTrack.css";
 import AuthorNavbar from "../components/AuthorNavbar";
+import BottomNavBar from "../components/BottomNavBar";
 
 const DietTrack = () => {
   const navigate = useNavigate();
@@ -318,6 +319,7 @@ const DietTrack = () => {
           })}
         </div>
       </div>
+      <BottomNavBar/>
     </div>
   );
 };

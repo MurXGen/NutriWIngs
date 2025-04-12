@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from 'framer-motion';
 import Abs from '../assets/workout/abs.gif'
-import { Play, CircleStop, Pause, CirclePlus, Info } from 'lucide-react'
+import { Play, X, CircleStop, Pause, CirclePlus, Info } from 'lucide-react'
+import Modal from '../components/Modal'; 
+import WorkoutTemplateSelector from "../components/WorkoutTemplateSelector";
 
 const LiveWorkout = () => {
   const navigate = useNavigate();
@@ -16,7 +18,28 @@ const LiveWorkout = () => {
   const [workoutMode, setWorkoutMode] = useState(null); // "timer" or "manual"
   const [duration, setDuration] = useState(""); // Store manual duration
   const [error, setError] = useState("");
-  const [StartTimer,setStartTimer] = useState("")
+  const [StartTimer, setStartTimer] = useState("");
+
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [currentEditingWorkout, setCurrentEditingWorkout] = useState(null);
+
+  // Add this function to handle template selection
+  const handleTemplateSelect = (template) => {
+    setCurrentWorkouts(prev =>
+      prev.map(workout => {
+        if (workout.id === currentEditingWorkout) {
+          return {
+            ...workout,
+            workoutName: template.name,
+            imageUrl: template.imageUrl,
+            category: template.category
+          };
+        }
+        return workout;
+      })
+    );
+    setShowTemplateModal(false);
+  };
 
 
   const [currentWorkouts, setCurrentWorkouts] = useState([
@@ -116,8 +139,11 @@ const LiveWorkout = () => {
     setIsRunning(false);
     setIsPaused(false);
 
+    const DEFAULT_WORKOUT_IMAGE = "https://res.cloudinary.com/dhjplff89/image/upload/v1744490374/nutriwings-workouts/ymlg21xdmv8ekee0n8cf.png";
+
     const completedWorkouts = currentWorkouts.map(workout => ({
       ...workout,
+      imageUrl: workout.imageUrl || DEFAULT_WORKOUT_IMAGE
     }));
 
     setWorkouts(prev => [...prev, ...completedWorkouts]);
@@ -150,7 +176,7 @@ const LiveWorkout = () => {
       });
 
       const data = await response.json();
-      
+
       console.log("Workout saved:", data);
       navigate("/workout");
     } catch (error) {
@@ -386,7 +412,7 @@ const LiveWorkout = () => {
             <button onClick={() => setWorkoutMode("timer")}>Timer-Based</button>
             <button onClick={() => setWorkoutMode("manual")}>Manual-Based</button>
           </div>
-          <Link to="/workout" style={{ color: '#5ba2fe', fontSize: '12px', letterSpacing: '1px', background: '#5ba2fe20', padding: "12px 24px", borderRadius: '20px' }}>I'll Log Later...</Link>
+          <Link to="/workout" className="modeSelectionCancel" ><X size="24px" /></Link>
         </div>
       )}
 
@@ -449,7 +475,19 @@ const LiveWorkout = () => {
                   ×
                 </button>
                 <div className="workoutImg">
-                  <img src={Abs} alt="Workout demonstration" />
+                  {workout.imageUrl ? (
+                    <img src={workout.imageUrl} alt={workout.workoutName} />
+                  ) : (
+                    <div
+                      className="template-placeholder"
+                      onClick={() => {
+                        setCurrentEditingWorkout(workout.id);
+                        setShowTemplateModal(true);
+                      }}
+                    >
+                      <span>Choose Template</span>
+                    </div>
+                  )}
                 </div>
                 <div className="workoutForm">
                   <div style={{ display: 'flex', gap: '12px' }}>
@@ -557,6 +595,11 @@ const LiveWorkout = () => {
         </div>
 
       </div>
+      {showTemplateModal && (
+        <Modal onClose={() => setShowTemplateModal(false)}>
+          <WorkoutTemplateSelector onSelectTemplate={handleTemplateSelect} />
+        </Modal>
+      )}
 
 
 

@@ -150,9 +150,10 @@ export default function WorkoutTemplates() {
                 type="file"
                 name="image"
                 onChange={handleChange}
-                accept="image/*"
+                accept="image/*,.gif"
                 className="file-input"
               />
+
             </label>
           </div>
 
@@ -164,6 +165,7 @@ export default function WorkoutTemplates() {
               transition={{ duration: 0.3 }}
             >
               <img src={imagePreview} alt="Preview" className="image-preview" />
+
             </motion.div>
           )}
 

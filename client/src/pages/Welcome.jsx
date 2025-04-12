@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import RegisterNavbar from "../components/Navbar";
-import WelcomeIcon from '../assets/welcomeillus.svg'
+import WelcomeIcon from '../assets/welcomeIllus.svg'
 import { Ruler, ChevronLeft, ChevronRight,MessageCircleWarning } from "lucide-react";
 
 const Welcome = () => {

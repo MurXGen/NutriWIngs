@@ -246,24 +246,22 @@ const LogDiet = () => {
 
       <div className="dateTimeForLog">
         
-        <label style={{ display: "block", marginBottom: "8px" }}>
-          Date:
+        <label>
+
           <input
             type="date"
             value={diet.date}
             onChange={handleDateChange}
-            style={{ marginLeft: "10px", padding: "5px" }}
           />
         </label>
 
         {/* Time Picker */}
-        <label style={{ display: "block", marginTop: "12px", marginBottom: "8px" }}>
-          Time:
+        <label>
+
           <input
             type="time"
             value={diet.time}
             onChange={handleTimeChange}
-            style={{ marginLeft: "10px", padding: "5px" }}
           />
         </label>
       </div>
@@ -338,7 +336,7 @@ const LogDiet = () => {
 
         <div className="food_inputContainer">
 
-          <span><IceCreamBowl />Food name</span>
+          <span><IceCreamBowl color="#5ba2fe" size={16}/>Food name</span>
           <input
             type="text"
             name="foodName"
@@ -349,7 +347,7 @@ const LogDiet = () => {
         </div>
 
         <div className="food_inputContainer">
-          <span><NotepadTextDashed />Nutritional Values</span>
+          <span><NotepadTextDashed color="#5ba2fe" size={16}/>Nutritional Values</span>
           <input
             type="number"
             name="portionSize"
@@ -387,10 +385,10 @@ const LogDiet = () => {
         </div>
 
         <div className="actionButtons">
-          <button type="button" className="toggleButton" onClick={(e) => handleSubmit(e, "Draft")} disabled={loading}>
+          <button type="button" className="toggleButtonLight" onClick={(e) => handleSubmit(e, "Draft")} disabled={loading}>
             {loading ? "Saving Draft..." : "Save as Draft"}
           </button>
-          <button type="button" className="toggleButtonLight" onClick={(e) => handleSubmit(e, "Saved")} disabled={loading}>
+          <button type="button" className="toggleButton" onClick={(e) => handleSubmit(e, "Saved")} disabled={loading}>
             {loading ? "Submitting..." : "Save"}
           </button>
         </div>

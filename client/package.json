@@ -17,6 +17,7 @@
     "js-cookie": "^3.0.5",
     "js-cookies": "^1.0.4",
     "lucide-react": "^0.482.0",
+    "modal": "^0.2.0",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
     "react": "^19.0.0",

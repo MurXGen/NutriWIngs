@@ -4,13 +4,14 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthorNavbar from "../components/AuthorNavbar";
 import BmiHeading from '../assets/BmiHeading.svg';
-import { Salad, Dumbbell,Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass } from 'lucide-react';
+import { Salad, Dumbbell, Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass } from 'lucide-react';
 import foodTrack from '../assets/Dashboard/foodTrack.svg';
 import workoutSession from '../assets/Dashboard/workoutSession.svg';
 import Quick from '../assets/Dashboard/quick.svg';
 import Proceed from '../assets/Dashboard/proceed.svg';
 import Sleep from '../assets/Dashboard/sleepLabel.svg';
 import Muscle from '../assets/Dashboard/Muscle.svg';
+import BottomNavBar from "../components/BottomNavBar";
 
 // =================== Component =================== //
 const Dashboard = () => {
@@ -69,14 +70,12 @@ const Dashboard = () => {
       console.log(`Workout Action Quality: ${details.actionPoints}/15`);
     } catch (err) {
       console.error("Error fetching strength score", err);
-    }
-  };
+    }};
 
   useEffect(() => {
     fetchStrengthScore();
-    const interval = setInterval(fetchStrengthScore, 60000); // refresh every 60 seconds
-    return () => clearInterval(interval);
-  }, []);
+  }, [userId]);
+
 
   const fetchWaterEntries = async () => {
     try {
@@ -446,6 +445,7 @@ const Dashboard = () => {
     <div className="dashboard">
       <AuthorNavbar />
 
+
       <div className="strengthCalculator">
         <div className="labelCont">
           <Sparkles color="#5ba2fe" size={"16px"} />
@@ -470,16 +470,18 @@ const Dashboard = () => {
         </div>
 
         <div className="progressInfo">
-          <span>Less Growth  50%</span>
-          <span>Balanced  50%</span>
-          <span>Stronger  80%</span>
-          <span>Strongest  100%</span>
+          <span className={score < 50 ? 'highlight' : ''}>Less Growth &lt; 50</span>
+          <span className={score >= 50 && score < 60 ? 'highlight' : ''}>Balanced ≥ 50 &amp; &lt; 60</span>
+          <span className={score >= 60 && score < 80 ? 'highlight' : ''}>Stronger ≥ 60 &amp; &lt; 80</span>
+          <span className={score >= 80 ? 'highlight' : ''}>Strongest ≥ 80%</span>
         </div>
 
         <div className="note">
           <BadgeInfo size="24px" />
           <span>We use your Nutritional intake, Workout reps & failures to measure this metric</span>
         </div>
+
+        <button className="toggleButton"  onClick={() => navigate("/strength-metrics")}>Analyse<ArrowRight/></button>
       </div>
 
       <motion.div className="otherMetrics" initial="hidden" animate="visible" variants={popInEffect}>
@@ -712,7 +714,7 @@ const Dashboard = () => {
       {/* --- BMI Tracker --- */}
       <div className="bmiTool">
         <div className="toolHeading">
-        <Calculator color="#5BA2FE" size={"16px"}/>
+          <Calculator color="#5BA2FE" size={"16px"} />
           <span>Body Mass Index (BMI)</span>
         </div>
         <div className="bmiMetric">
@@ -723,6 +725,7 @@ const Dashboard = () => {
                 transform: `rotate(${(bmi / 40) * 180 - 180}deg)`,
                 borderTopColor: getProgressBarColor(bmi),
                 borderLeftColor: getProgressBarColor(bmi),
+                boxShadow: '1px 4px 8px #5ba2fe80',
               }}
             ></div>
             <div className="bmiValue">{bmi}</div>
@@ -760,6 +763,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      <BottomNavBar />
     </div >
   );
 };
