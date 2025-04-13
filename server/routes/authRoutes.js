@@ -117,7 +117,7 @@ router.post("/register", async (req, res) => {
     // ✅ Set Cookie to Keep User Logged In
     res.cookie("userId", newUser._id.toString(), {
       httpOnly: true,
-      secure: true, // Set to true in production
+      secure: false, // Set to true in production
       sameSite: "Lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
@@ -146,7 +146,7 @@ router.post("/login", async (req, res) => {
 
     res.cookie("userId", user._id.toString(), {
       httpOnly: true,
-      secure: true, // Change to `true` in production with HTTPS
+      secure: false, // Change to `true` in production with HTTPS
       sameSite: "Lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
