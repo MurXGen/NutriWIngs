@@ -19,7 +19,7 @@ const workoutTemplateSchema = new mongoose.Schema({
         required: true
     },
 }, { collection: 'workouttemplates' });
-const tempConnection = mongoose.createConnection('mongodb://localhost:27017/Nutriwings_Admin');
+// const tempConnection = mongoose.createConnection('mongodb://localhost:27017/Nutriwings_Admin');
 const WorkoutTemplate = tempConnection.model('WorkoutTemplate', workoutTemplateSchema);
 
 

@@ -15,21 +15,25 @@ import StrengthMetrics from "./pages/StrengthMetrics";
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/welcome" element={<Welcome />} />
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/diet-tracker" element={<DietTrack />} />
-      <Route path="/log-diet" element={<LogDiet />} />
-      <Route path="/diet-history" element={<DietHistory />} />
+<Routes>
+  <Route path="/welcome" element={<Welcome />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/register" element={<Register />} />
 
-      <Route path="/workout" element={<Workout />} />
-      <Route path="/loglive-workout" element={<LiveWorkout />} />
-      <Route path="/workout-history" element={< WorkoutHistoryPage />} />
-      <Route path="/strength-metrics" element={< StrengthMetrics />} />
-    </Routes>
+  {/* Protected Routes */}
+  <Route element={<ProtectedRoute />}>
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/profile" element={<Profile />} />
+    <Route path="/diet-tracker" element={<DietTrack />} />
+    <Route path="/log-diet" element={<LogDiet />} />
+    <Route path="/diet-history" element={<DietHistory />} />
+    <Route path="/workout" element={<Workout />} />
+    <Route path="/loglive-workout" element={<LiveWorkout />} />
+    <Route path="/workout-history" element={<WorkoutHistoryPage />} />
+    <Route path="/strength-metrics" element={<StrengthMetrics />} />
+  </Route>
+</Routes>
+
   );
 };
 
