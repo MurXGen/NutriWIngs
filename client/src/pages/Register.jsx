@@ -45,8 +45,8 @@ const Register = () => {
         mobile: userData.mobile,
         password: userData.password,
         healthDetails: {
-          weight: userData.weight,
-          height: userData.height,
+          weight: userData.weight || 65,
+          height: userData.height || 150,
           lifestyle: userData.lifestyle,
         },
       });

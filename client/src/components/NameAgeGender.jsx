@@ -24,8 +24,12 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
   };
 
   const days = generateDays(selectedMonth, selectedYear);
-  const months = Array.from({ length: 12 }, (_, i) => i + 1);
-  const years = Array.from({ length: currentYear - 1899 }, (_, i) => 1900 + i);
+  const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  const years = Array.from({ length: currentYear - 1899 }, (_, i) => 1970 + i);
 
   // Ensure selected date does not exceed current date
   useEffect(() => {
@@ -42,21 +46,21 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
       onChange("age", age);
     }
   }, [age]);
-  
+
 
   // Calculate age when all three values are selected
   useEffect(() => {
     if (selectedYear && selectedMonth && selectedDay) {
       let calculatedAge = currentYear - selectedYear;
-  
+
       if (selectedMonth > currentMonth || (selectedMonth === currentMonth && selectedDay > currentDay)) {
         calculatedAge -= 1;
       }
-  
+
       setAge(calculatedAge);
     }
   }, [selectedDay, selectedMonth, selectedYear]);
-  
+
 
   useEffect(() => {
     onChange("day", selectedDay);
@@ -118,8 +122,10 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
               transition={{ duration: 0.2 }}
             >
               <option value="">Month</option>
-              {months.map((month) => (
-                <option key={month} value={month}>{month}</option>
+              {monthNames.map((monthName, index) => (
+                <option key={index + 1} value={index + 1}>
+                  {monthName}
+                </option>
               ))}
             </motion.select>
             <span>Month</span>
@@ -168,11 +174,11 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
       </motion.div>
 
       <button className="proceed" onClick={() => {
-    onNext();
-  }}>
+        onNext();
+      }}>
         Proceed <ChevronRight />
       </button>
-      <LoginRedirect/>
+      <LoginRedirect />
     </motion.div>
   );
 };

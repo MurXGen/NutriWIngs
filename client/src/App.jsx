@@ -18,12 +18,13 @@ const App = () => {
     <Routes>
 
       {/* Public routes (accessible without auth) */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+
       <Route path="/welcome" element={<Welcome />} />
 
       {/* Protected routes */}
       <Route element={<ProtectedRoute />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/diet-tracker" element={<DietTrack />} />
