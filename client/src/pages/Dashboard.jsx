@@ -97,7 +97,6 @@ const Dashboard = () => {
       setWaterInput(250); // reset input
       fetchWaterEntries(); // refresh
       setRefresh(prev => !prev); // <--- refetch trigger
-      setTotalSleepDuration()
     } catch (error) {
       console.error('Error adding water entry:', error);
     }

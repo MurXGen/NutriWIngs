@@ -157,4 +157,5 @@ router.get("/calorie-data", async (req, res) => {
 
 router.delete('/delete/:userId/:dietId', deleteDietEntry);
 
+
 module.exports = router;

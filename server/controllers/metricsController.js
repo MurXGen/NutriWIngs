@@ -522,6 +522,29 @@ exports.calculateStrengthScore = async (req, res) => {
       durationPoints + consistencyPoints +
       intensityPoints + failurePoints + actionPoints;
 
+    // Remove existing score for today if it exists
+    user.StrengthScores = user.StrengthScores.filter(score => {
+      const scoreDate = new Date(score.date).toDateString();
+      return scoreDate !== new Date().toDateString();
+    });
+
+    // Push today's new score
+    user.StrengthScores.push({
+      date: new Date(),
+      totalScore: Number(totalScore.toFixed(1)),
+      proteinScore: Number(proteinScore.toFixed(1)),
+      waterScore: Number(waterScore.toFixed(1)),
+      fatScore: Number(fatScore.toFixed(1)),
+      carbScore: Number(carbScore.toFixed(1)),
+      durationPoints: Number(durationPoints.toFixed(1)),
+      consistencyPoints: Number(consistencyPoints.toFixed(1)),
+      intensityPoints: Number(intensityPoints.toFixed(1)),
+      failurePoints: Number(failurePoints.toFixed(1)),
+      actionPoints: Number(actionPoints.toFixed(1))
+    });
+
+    await user.save();
+
     res.status(200).json({
       totalScore: Number(Math.min(totalScore, 100).toFixed(1)),
       details: {
@@ -542,5 +565,109 @@ exports.calculateStrengthScore = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+
+exports.getStrengthScoreByDate = async (req, res) => {
+  const { userId, date } = req.params;
+
+  try {
+    console.log('Received userId:', userId);
+    console.log('Received date:', date);
+
+    const targetDate = new Date(date);
+    console.log('Target date:', targetDate);
+
+    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+    console.log('Start of day:', startOfDay);
+    console.log('End of day:', endOfDay);
+
+    // Fetch the user document by userId
+    const user = await User.findOne({
+      _id: userId,
+      "StrengthScores.date": { $gte: startOfDay, $lte: endOfDay }
+    }).select('StrengthScores');
+
+    if (!user) {
+      console.log('No user found for this ID');
+      return res.status(404).json({ message: "No user found." });
+    }
+
+    // Find the specific StrengthScore for the given date
+    const scoreRecord = user.StrengthScores.find(score =>
+      score.date >= startOfDay && score.date <= endOfDay
+    );
+
+    if (!scoreRecord) {
+      console.log('No score found for this date');
+      return res.status(404).json({ message: "No score found for this date." });
+    }
+
+    console.log('Score record found:', scoreRecord);
+
+    const {
+      totalScore, proteinScore, waterScore, fatScore, carbScore,
+      durationPoints, consistencyPoints, intensityPoints,
+      failurePoints, actionPoints
+    } = scoreRecord;
+
+    console.log('Scores extracted:', {
+      totalScore, proteinScore, waterScore, fatScore, carbScore,
+      durationPoints, consistencyPoints, intensityPoints,
+      failurePoints, actionPoints
+    });
+
+    return res.json({
+      totalScore,
+      details: {
+        proteinScore, waterScore, fatScore, carbScore,
+        durationPoints, consistencyPoints, intensityPoints,
+        failurePoints, actionPoints
+      }
+    });
+
+  } catch (err) {
+    console.error('Error occurred:', err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getStrengthDates = async (req, res) => {
+  const { userId } = req.params;  // Get the userId from the request params
+
+  try {
+    // Fetch the user by their userId, only selecting the StrengthScores array
+    const user = await User.findById(userId).select('StrengthScores');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Extract only the dates from the StrengthScores array
+    const datesWithData = user.StrengthScores.map(score => ({
+      date: score.date,  // Add the date
+      totalScore: score.totalScore,  // Optionally, include other relevant data
+      proteinScore: score.proteinScore,
+      waterScore: score.waterScore,
+      fatScore: score.fatScore,
+      carbScore: score.carbScore,
+      durationPoints: score.durationPoints,
+      consistencyPoints: score.consistencyPoints,
+      intensityPoints: score.intensityPoints,
+      failurePoints: score.failurePoints,
+      actionPoints: score.actionPoints
+    }));
+
+    // Return the dates with data
+    return res.json({ dates: datesWithData });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
 
 

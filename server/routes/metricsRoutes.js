@@ -1,6 +1,6 @@
 const express = require("express");
 const { getDailyMetrics } = require("../controllers/metricsController");
-const { calculateStrengthScore,deleteWaterEntry, getTodaysWaterEntries, addWaterEntry, deleteSleepEntry, getTodaysSleepEntries, getTotalSleepDuration, startSleep, stopSleep, manualSleepEntry, getLatestSleep } = require("../controllers/metricsController");
+const { calculateStrengthScore,deleteWaterEntry,getStrengthDates,getStrengthScoreByDate, getTodaysWaterEntries, addWaterEntry, deleteSleepEntry, getTodaysSleepEntries, getTotalSleepDuration, startSleep, stopSleep, manualSleepEntry, getLatestSleep } = require("../controllers/metricsController");
 const router = express.Router();
 
 router.delete("/sleep/delete/:userId/:entryId", deleteSleepEntry);
@@ -15,6 +15,7 @@ router.post("/sleep/stop", stopSleep);
 router.post("/sleep/manual", manualSleepEntry);
 
 router.get("/sleep/latest/:userId", getLatestSleep);
+router.get("/daily-metrics", getDailyMetrics); // Fetch today's metrics
 
 // Water Track
 
@@ -26,6 +27,8 @@ router.delete('/water/delete/:userId/:entryId', deleteWaterEntry);
 
 router.get("/strength/daily-score/:userId", calculateStrengthScore);
 
-router.get("/daily-metrics", getDailyMetrics); // Fetch today's metrics
+router.get('/strength/daily-score/:userId/:date', getStrengthScoreByDate);
+
+router.get('/strength/dates/:userId', getStrengthDates);
 
 module.exports = router;

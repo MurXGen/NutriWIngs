@@ -53,7 +53,23 @@ const UserSchema = new mongoose.Schema({
     RecomCal: { type: Number, required: true }
   },
   healthDiets: [DietSchema],
-  recoveryFactors: { type: RecoverySchema, default: () => ({}) }
+  recoveryFactors: { type: RecoverySchema, default: () => ({}) },
+  StrengthScores: [
+    {
+      date: { type: Date, required: true },
+      totalScore: { type: Number, required: true },
+      proteinScore: Number,
+      waterScore: Number,
+      fatScore: Number,
+      carbScore: Number,
+      durationPoints: Number,
+      consistencyPoints: Number,
+      intensityPoints: Number,
+      failurePoints: Number,
+      actionPoints: Number
+    }
+  ]
+  
 });
 
 module.exports = mongoose.model("User", UserSchema);

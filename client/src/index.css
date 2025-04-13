@@ -3004,3 +3004,126 @@ select {
   color: var(--secondaryColor);
   font-size: var(--font-size-Smalltext);
 }
+
+.calendar-section {
+  padding: var(--paddingBox);
+  background-color: var(--whiteColor50);
+  border-radius: var(--borderRSize-Big);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  overflow-x: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.month-year {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.date-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+}
+
+.date-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.date-box {
+  min-width: 50px;
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.date-box .day {
+  font-size: 0.75rem;
+}
+
+.date-box .date {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+
+.date-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 8px 0;
+  margin: 8px 0;
+}
+
+.date-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  transition: all 0.2s ease;
+}
+
+.date-box:hover {
+  transform: scale(1.05);
+}
+
+.date-box.today {
+  border: 2px solid #5ba2fe;
+}
+
+.day {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.date {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.date-box.today .date {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.date-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 8px 0;
+  margin: 8px 0;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.date-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.date-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.date-scroll::-webkit-scrollbar-thumb {
+  background: #5ba2fe;
+  border-radius: 4px;
+}
+
+.date-box {
+  scroll-snap-align: center;
+}
