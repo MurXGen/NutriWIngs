@@ -17,8 +17,8 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://nutriwings.vercel.app/", 
-    credentials: true, 
+    origin: "https://nutriwings.vercel.app", // 
+    credentials: true,
   })
 );
 app.use(cookieParser());
