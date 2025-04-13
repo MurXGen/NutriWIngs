@@ -24,6 +24,11 @@ app.use(
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });
+
+app.get('/', (req, res) => {
+  res.send('Welcome to NutriWings API');
+});
+
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
