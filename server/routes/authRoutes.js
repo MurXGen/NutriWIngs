@@ -19,7 +19,6 @@ router.get("/profile", async (req, res) => {
 });
 
 
-// ✅ User Session (used in Profile Page)
 router.get("/session", async (req, res) => {
   try {
     const userId = req.cookies.userId;
@@ -34,11 +33,11 @@ router.get("/session", async (req, res) => {
   }
 });
 
-router.post("/logout",(req, res) => {
+router.post("/logout", (req, res) => {
   res.clearCookie("userId", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
   });
   res.status(200).json({ message: "Logout successful" });
 });
@@ -82,12 +81,10 @@ router.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "Mobile number already registered" });
     }
-
     const heightInCm = parseInt(healthDetails.height);
     if (isNaN(heightInCm) || isNaN(healthDetails.weight) || isNaN(age)) {
       return res.status(400).json({ message: "Invalid numeric values" });
     }
-
     let BMR = gender === "Male"
       ? 10 * healthDetails.weight + 6.25 * heightInCm - 5 * age + 5
       : 10 * healthDetails.weight + 6.25 * heightInCm - 5 * age - 161;
@@ -120,7 +117,7 @@ router.post("/register", async (req, res) => {
     // ✅ Set Cookie to Keep User Logged In
     res.cookie("userId", newUser._id.toString(), {
       httpOnly: true,
-      secure: false, // Set to true in production
+      secure: true, // Set to true in production
       sameSite: "Lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
@@ -149,7 +146,7 @@ router.post("/login", async (req, res) => {
 
     res.cookie("userId", user._id.toString(), {
       httpOnly: true,
-      secure: false, // Change to `true` in production with HTTPS
+      secure: true, // Change to `true` in production with HTTPS
       sameSite: "Lax",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
