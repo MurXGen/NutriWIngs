@@ -30,7 +30,7 @@ const StrengthMetrics = () => {
     const fetchStrengthScore = async () => {
         try {
             setIsLoading(true);
-            const res = await axios.get(`http://localhost:5000/api/strength/daily-score/${userId}`);
+            const res = await axios.get(`https://nutriwings.onrender.com/api/strength/daily-score/${userId}`);
             const { totalScore, details } = res.data;
             setScore(totalScore);
             setDetails(details);
@@ -122,7 +122,7 @@ const StrengthMetrics = () => {
         try {
             setIsLoading(true);
             const isoDate = new Date(date).toISOString();
-            const res = await axios.get(`http://localhost:5000/api/strength/daily-score/${userId}/${isoDate}`);
+            const res = await axios.get(`https://nutriwings.onrender.com/api/strength/daily-score/${userId}/${isoDate}`);
             const { totalScore, details } = res.data;
             setScore(totalScore);
             setDetails(details);
@@ -143,7 +143,7 @@ const StrengthMetrics = () => {
 
     const fetchAllDatesWithData = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/strength/dates/${userId}`);
+            const res = await axios.get(`https://nutriwings.onrender.com/api/strength/dates/${userId}`);
             setDatesWithData(res.data.dates || []);  // Store the dates with data in state
         } catch (err) {
             console.error("Failed to fetch active strength dates", err);

@@ -13,7 +13,7 @@ const AuthorNavbar = () => {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/auth/session", { withCredentials: true });
+                const response = await axios.get("https://nutriwings.onrender.com/api/auth/session", { withCredentials: true });
                 setUser(response.data);
             } catch (error) {
                 console.error("Error fetching user session:", error);
@@ -29,7 +29,7 @@ const AuthorNavbar = () => {
     // Handle logout
     const handleLogout = async () => {
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+            const response = await axios.post("https://nutriwings.onrender.com/api/auth/logout", {}, { withCredentials: true });
             console.log("Logout successful:", response.data); // Log success message
             navigate("/login");
         } catch (error) {

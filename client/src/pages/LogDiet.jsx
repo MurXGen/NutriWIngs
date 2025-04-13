@@ -48,7 +48,7 @@ const LogDiet = () => {
       const fetchDiet = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`http://localhost:5000/api/diet/dietEdit/${dietId}`);
+          const response = await axios.get(`https://nutriwings.onrender.com/api/diet/dietEdit/${dietId}`);
           const fetchedDiet = response.data;
 
           setDiet({
@@ -207,11 +207,11 @@ const LogDiet = () => {
     try {
       let response;
       if (dietId) {
-        response = await axios.put(`http://localhost:5000/api/diet/updateDiet/${dietId}`, dietData, {
+        response = await axios.put(`https://nutriwings.onrender.com/api/diet/updateDiet/${dietId}`, dietData, {
           headers: { "Content-Type": "application/json" },
         });
       } else {
-        response = await axios.post("http://localhost:5000/api/diet/log", dietData, {
+        response = await axios.post("https://nutriwings.onrender.com/api/diet/log", dietData, {
           headers: { "Content-Type": "application/json" },
         });
       }

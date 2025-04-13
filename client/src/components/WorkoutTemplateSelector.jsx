@@ -67,7 +67,7 @@ const WorkoutTemplateSelector = ({ onSelectTemplate }) => {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/workouts/templates', {
+        const response = await fetch('https://nutriwings.onrender.com/api/workouts/templates', {
           credentials: 'include'
         });
         const data = await response.json();

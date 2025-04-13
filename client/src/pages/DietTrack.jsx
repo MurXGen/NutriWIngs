@@ -125,7 +125,7 @@ const DietTrack = () => {
 
   const fetchDietStats = async (date, userId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/diet/diet-stats?date=${date}&userId=${userId}`);
+      const response = await axios.get(`https://nutriwings.onrender.com/api/diet/diet-stats?date=${date}&userId=${userId}`);
       if (response.data.success) {
         setDietStats(response.data.stats || { totalCalories: 0, totalCarbs: 0, totalProtein: 0, totalFats: 0 });
       }
@@ -136,7 +136,7 @@ const DietTrack = () => {
 
   const fetchRecomCal = async (userId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/diet/recomcal?userId=${userId}`);
+      const response = await axios.get(`https://nutriwings.onrender.com/api/diet/recomcal?userId=${userId}`);
       if (response.data.success) {
         setRecomCal(response.data.recomCal);
       } else {
@@ -151,7 +151,7 @@ const DietTrack = () => {
   const fetchCalorieDataForMonth = async (year, monthIndex, userId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/diet/calorie-data?year=${year}&month=${monthIndex + 1}&userId=${userId}`
+        `https://nutriwings.onrender.com/api/diet/calorie-data?year=${year}&month=${monthIndex + 1}&userId=${userId}`
       );
       if (response.data.success) {
         setCalorieData(response.data.calorieData || {});

@@ -25,13 +25,13 @@ const DietHistory = () => {
         if (!userId) throw new Error("User ID not found. Please log in again.");
 
         // Fetch diet history for the user
-        const response = await fetch(`http://localhost:5000/api/diet/history?userId=${userId}`);
+        const response = await fetch(`https://nutriwings.onrender.com/api/diet/history?userId=${userId}`);
         if (!response.ok) throw new Error("Failed to fetch diet history");
         const data = await response.json();
         setHistory(data);
 
         // Fetch RecomCal from the new API
-        const recomCalResponse = await fetch(`http://localhost:5000/api/diet/recomcal?userId=${userId}`);
+        const recomCalResponse = await fetch(`https://nutriwings.onrender.com/api/diet/recomcal?userId=${userId}`);
         if (recomCalResponse.ok) {
           const recomCalData = await recomCalResponse.json();
           // Check if RecomCal is fetched correctly
@@ -114,14 +114,14 @@ const DietHistory = () => {
 
     try {
       // Send delete request
-      const res = await fetch(`http://localhost:5000/api/diet/delete/${userId}/${dietId}`, {
+      const res = await fetch(`https://nutriwings.onrender.com/api/diet/delete/${userId}/${dietId}`, {
         method: "DELETE",
       });
 
       if (!res.ok) throw new Error("Failed to delete diet entry");
 
       // Fetch updated history after deletion
-      const updatedResponse = await fetch(`http://localhost:5000/api/diet/history?userId=${userId}`);
+      const updatedResponse = await fetch(`https://nutriwings.onrender.com/api/diet/history?userId=${userId}`);
       if (!updatedResponse.ok) throw new Error("Failed to fetch updated diet history");
 
       const updatedData = await updatedResponse.json();

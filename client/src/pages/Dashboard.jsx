@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   const fetchStrengthScore = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/strength/daily-score/${userId}`);
+      const res = await axios.get(`https://nutriwings.onrender.com/api/strength/daily-score/${userId}`);
       const { totalScore, details } = res.data;
       setScore(totalScore);
 
@@ -79,7 +79,7 @@ const Dashboard = () => {
 
   const fetchWaterEntries = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
+      const res = await axios.get(`https://nutriwings.onrender.com/api/water/today/${userId}`);
       setWaterHistory(res.data.entries || []);
     } catch (error) {
       console.error('Error fetching water history:', error);
@@ -91,7 +91,7 @@ const Dashboard = () => {
     if (!waterInput || isNaN(waterInput) || waterInput <= 0) return;
 
     try {
-      await axios.post(`http://localhost:5000/api/water/add/${userId}`, {
+      await axios.post(`https://nutriwings.onrender.com/api/water/add/${userId}`, {
         waterContent: Number(waterInput),
       });
       setWaterInput(250); // reset input
@@ -105,7 +105,7 @@ const Dashboard = () => {
   // Delete entry
   const handleDeleteEntry = async (entryId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/water/delete/${userId}/${entryId}`);
+      await axios.delete(`https://nutriwings.onrender.com/api/water/delete/${userId}/${entryId}`);
       fetchWaterEntries(); // refresh
       setRefresh(prev => !prev); // <--- refetch trigger
       setTotalSleepDuration()
@@ -117,7 +117,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTotalWater = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
+        const res = await axios.get(`https://nutriwings.onrender.com/api/water/today/${userId}`);
         const total = res.data.entries.reduce((sum, entry) => sum + entry.waterContent, 0);
         setTotalWater(total);
       } catch (err) {
@@ -136,7 +136,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (userId) {
       const fetchEntries = async () => {
-        const res = await axios.get(`http://localhost:5000/api/water/today/${userId}`);
+        const res = await axios.get(`https://nutriwings.onrender.com/api/water/today/${userId}`);
         const total = res.data.entries.reduce((sum, e) => sum + e.waterContent, 0);
         setTotalWater(total);
       };
@@ -156,7 +156,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/daily-metrics", { withCredentials: true });
+        const response = await axios.get("https://nutriwings.onrender.com/api/daily-metrics", { withCredentials: true });
         setTotalCalories(response.data.totalCalories);
         setTotalDuration(response.data.totalDuration);
       } catch (error) {
@@ -170,7 +170,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/auth/session", { withCredentials: true });
+        const response = await axios.get("https://nutriwings.onrender.com/api/auth/session", { withCredentials: true });
         setUser(response.data);
         const userWeight = response.data.healthDetails.weight;
         const userHeight = response.data.healthDetails.height;
@@ -208,7 +208,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchLatestSleep = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/sleep/latest/${userId}`);
+        const res = await axios.get(`https://nutriwings.onrender.com/api/sleep/latest/${userId}`);
         const latest = res.data.latestSleep;
 
         if (latest && latest.startDateTime && !latest.endDateTime) {
@@ -244,7 +244,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchTotalSleep = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/sleep/total/${userId}`);
+        const res = await axios.get(`https://nutriwings.onrender.com/api/sleep/total/${userId}`);
         setTotalSleepDuration(res.data.totalDuration || 0);
       } catch (error) {
         console.error("Error fetching total sleep duration:", error);
@@ -335,7 +335,7 @@ const Dashboard = () => {
   const handleStart = async () => {
     try {
       const now = new Date().toISOString();
-      const res = await axios.post("http://localhost:5000/api/sleep/start", {
+      const res = await axios.post("https://nutriwings.onrender.com/api/sleep/start", {
         userId,
         startDateTime: now,
       });
@@ -352,7 +352,7 @@ const Dashboard = () => {
   const handleStop = async () => {
     try {
       const end = new Date().toISOString();
-      await axios.post("http://localhost:5000/api/sleep/stop", {
+      await axios.post("https://nutriwings.onrender.com/api/sleep/stop", {
         userId,
         endDateTime: end,
         duration: elapsedTime,
@@ -382,7 +382,7 @@ const Dashboard = () => {
 
       const durationInSeconds = durationUnit === "hours" ? value * 3600 : value * 60;
 
-      await axios.post("http://localhost:5000/api/sleep/manual", {
+      await axios.post("https://nutriwings.onrender.com/api/sleep/manual", {
         userId,
         duration: durationInSeconds,
         endDateTime: end,
@@ -399,7 +399,7 @@ const Dashboard = () => {
   // Delete a specific entry
   const handleDeleteSleepEntry = async (entryId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/sleep/delete/${userId}/${entryId}`);
+      await axios.delete(`https://nutriwings.onrender.com/api/sleep/delete/${userId}/${entryId}`);
       fetchSleepEntries(); // Refresh after delete
     } catch (err) {
       console.error("Error deleting sleep entry:", err);
@@ -412,7 +412,7 @@ const Dashboard = () => {
   // Fetch today's sleep entries
   const fetchSleepEntries = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/sleep/entries/${userId}`);
+      const res = await axios.get(`https://nutriwings.onrender.com/api/sleep/entries/${userId}`);
       const entries = res.data.entries || [];
 
       console.log("Fetched entries:", entries);

@@ -13,7 +13,7 @@ const WorkoutHistory = () => {
 
   const fetchWorkoutHistory = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/workouts/workout-history", {
+      const response = await axios.get("https://nutriwings.onrender.com/api/workouts/workout-history", {
         withCredentials: true,
       });
       setWorkouts(Array.isArray(response.data) ? response.data : []);
@@ -53,7 +53,7 @@ const WorkoutHistory = () => {
     const workout = w.workouts[childIndex];
     try {
       await axios.put(
-        "http://localhost:5000/api/workouts/update",
+        "https://nutriwings.onrender.com/api/workouts/update",
         {
           workoutName: workout.workoutName,
           actions: workout.actions,
@@ -72,7 +72,7 @@ const WorkoutHistory = () => {
     const workout = w.workouts[childIndex];
     try {
       await axios.put(
-        "http://localhost:5000/api/workouts/delete-single",
+        "https://nutriwings.onrender.com/api/workouts/delete-single",
         {
           workout: {
             workoutName: workout.workoutName,
@@ -93,7 +93,7 @@ const WorkoutHistory = () => {
 
   const handleDeleteSession = async (date) => {
     try {
-      await axios.delete("http://localhost:5000/api/workouts/delete-session", {
+      await axios.delete("https://nutriwings.onrender.com/api/workouts/delete-session", {
         data: { date },
         withCredentials: true,
       });

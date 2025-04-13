@@ -38,7 +38,7 @@ const Register = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", {
+      const response = await axios.post("https://nutriwings.onrender.com/api/auth/register", {
         name: userData.name,
         age: userData.age,
         gender: userData.gender,

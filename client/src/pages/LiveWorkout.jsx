@@ -162,7 +162,7 @@ const LiveWorkout = () => {
     setTimer(0);
 
     try {
-      const response = await fetch("http://localhost:5000/api/workouts/save-workout", {
+      const response = await fetch("https://nutriwings.onrender.com/api/workouts/save-workout", {
         method: "POST",
         credentials: "include",
         headers: {

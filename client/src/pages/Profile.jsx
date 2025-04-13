@@ -23,7 +23,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/auth/session", { withCredentials: true });
+        const response = await axios.get("https://nutriwings.onrender.com/api/auth/session", { withCredentials: true });
         setUser(response.data);
         setUpdatedDetails({
           name: response.data.name || "",
@@ -101,7 +101,7 @@ const Profile = () => {
       console.log("Data being sent to the backend:", updatePayload);
 
       const response = await axios.put(
-        `http://localhost:5000/api/diet/update/${user._id}`,
+        `https://nutriwings.onrender.com/api/diet/update/${user._id}`,
         updatePayload,
         { withCredentials: true }
       );
@@ -117,7 +117,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+      const response = await axios.post("https://nutriwings.onrender.com/api/auth/logout", {}, { withCredentials: true });
       console.log("Logout successful:", response.data); // Log success message
       navigate("/login");
     } catch (error) {

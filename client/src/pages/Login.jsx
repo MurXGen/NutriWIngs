@@ -18,7 +18,7 @@ const Login = () => {
     setError(""); // Reset error state
 
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
+      const response = await axios.post("https://nutriwings.onrender.com/api/auth/login", {
         mobile,
         password
       }, { withCredentials: true });
