@@ -118,6 +118,8 @@ router.post("/register", async (req, res) => {
     res.cookie("userId", newUser._id.toString(), {
       httpOnly: true,
       secure: true, // Set to true in production
+      sameSite:"None",
+      maxAge:86400000,
     });
 
     res.status(201).json({ message: "Registration successful", userId: newUser._id });
@@ -144,7 +146,9 @@ router.post("/login", async (req, res) => {
 
     res.cookie("userId", user._id.toString(), {
       httpOnly: true,
-      secure: true, // Change to `true` in production with HTTPS
+      secure: true,
+      sameSite:"None",
+      maxAge:86400000,
     });
 
     res.json({ message: "Login successful", userId: user._id });
