@@ -457,7 +457,7 @@ const Dashboard = () => {
 
 
   // ----------- Return JSX ----------- //
-  if (loading) return <p><NutriLoader /></p>;
+  if (loading) return <NutriLoader />;
   if (!user) return <Navigate to="/welcome" />;
 
   return (
