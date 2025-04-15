@@ -110,12 +110,15 @@ const Dashboard = () => {
 
   // Delete entry
   const handleDeleteEntry = async (entryId) => {
+    setIsSubmitting(true);
     try {
       await axios.delete(`https://nutriwings.onrender.com/api/water/delete/${userId}/${entryId}`);
       fetchWaterEntries(); // refresh
       setRefresh(prev => !prev); // <--- refetch trigger
     } catch (error) {
       console.error('Error deleting entry:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -338,6 +341,7 @@ const Dashboard = () => {
   };
 
   const handleStart = async () => {
+    setIsSubmitting(true);
     try {
       const now = new Date().toISOString();
       const res = await axios.post("https://nutriwings.onrender.com/api/sleep/start", {
@@ -351,10 +355,13 @@ const Dashboard = () => {
       setShowInput(false);
     } catch (error) {
       console.error("Error starting sleep:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleStop = async () => {
+    setIsSubmitting(true);
     try {
       const end = new Date().toISOString();
       await axios.post("https://nutriwings.onrender.com/api/sleep/stop", {
@@ -369,6 +376,8 @@ const Dashboard = () => {
       fetchSleepEntries(); // ✅ Refresh after timer stops
     } catch (error) {
       console.error("Error stopping sleep:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -380,6 +389,7 @@ const Dashboard = () => {
 
   // Submit duration with unit conversion
   const handleSubmitDuration = async () => {
+    setIsSubmitting(true);
     try {
       const value = parseInt(durationValue);
       if (isNaN(value) || value <= 0) return;
@@ -398,16 +408,21 @@ const Dashboard = () => {
       fetchSleepEntries(); // Refresh after entry
     } catch (error) {
       console.error("Error submitting manual sleep:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Delete a specific entry
   const handleDeleteSleepEntry = async (entryId) => {
+    setIsSubmitting(true);
     try {
       await axios.delete(`https://nutriwings.onrender.com/api/sleep/delete/${userId}/${entryId}`);
       fetchSleepEntries(); // Refresh after delete
     } catch (err) {
       console.error("Error deleting sleep entry:", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -579,7 +594,14 @@ const Dashboard = () => {
 
                     <div key={entry._id} className="entryRow">
                       <span>{entry.waterContent} ml</span>
-                      <button onClick={() => handleDeleteEntry(entry._id)}><CircleX size={"16px"} /></button>
+                      <button
+                        onClick={() => handleDeleteEntry(entry._id)}
+                        className="save-button"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? <Loader2 size={"16px"} /> : <CircleX size={"16px"} />}
+
+                      </button>
                     </div>
 
 
@@ -635,8 +657,13 @@ const Dashboard = () => {
               <span className="note"><Lamp /> Have a peaceful sleep !</span>
               <div className="timerDisplay">
                 <span>{formatTime(elapsedTime)}</span>
-                <motion.button onClick={handleStop} whileTap={{ scale: 0.95 }}>
-                  Stop
+                <motion.button
+                  className="save-button"
+                  disabled={isSubmitting}
+                  onClick={handleStop}
+                  whileTap={{ scale: 0.95 }}>
+                  {isSubmitting ? <Loader2 size={12} /> : "Stop"}
+
                 </motion.button>
               </div>
 
@@ -685,8 +712,13 @@ const Dashboard = () => {
 
 
               </div>
-              <motion.button onClick={handleSubmitDuration} whileTap={{ scale: 0.95 }}>
-                <ArrowRight color="white" />
+              <motion.button
+                className="save-button"
+                disabled={isSubmitting}
+                onClick={handleSubmitDuration}
+                whileTap={{ scale: 0.95 }}>
+                {isSubmitting ? <Loader2 color="white" /> : <ArrowRight color="white" />}
+
               </motion.button>
 
 
@@ -707,8 +739,12 @@ const Dashboard = () => {
               {sleepEntries.map((entry) => (
                 <div className="sleepEntry" key={entry._id}>
                   <span>{formatSleepEntryDuration(entry.totalDuration)}</span>
-                  <button onClick={() => handleDeleteSleepEntry(entry._id)}>
-                    <CircleX size={"16px"} />
+                  <button
+                    className="save-button"
+                    disabled={isSubmitting}
+                    onClick={() => handleDeleteSleepEntry(entry._id)}>
+                    {isSubmitting ? <Loader2 size={"16px"} /> : <CircleX size={"16px"} />}
+
                   </button>
                 </div>
               ))}
