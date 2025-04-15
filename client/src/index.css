@@ -47,7 +47,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px; /* or whatever space the loading box should take */
+  height: 100px; /* or whatever space the loading box should take */
   width: 100%;
 }
 
