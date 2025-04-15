@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ProfileIcon from '../assets/Profile.svg'
-import { User, Settings, LogOut } from "lucide-react"; // Icons for profile and logout
+import { User, Settings, LogOut } from "lucide-react"; 
+import NutriLoader from '../components/NutriLoader'
 
 const AuthorNavbar = () => {
     const [user, setUser] = useState(null);
