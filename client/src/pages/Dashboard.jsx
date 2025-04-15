@@ -462,11 +462,9 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {loading ? (
-        <NutriLoader />
-      ) : (
+
         <AuthorNavbar />
-      )}
+
 
 
 
