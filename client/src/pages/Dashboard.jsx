@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthorNavbar from "../components/AuthorNavbar";
 import BmiHeading from '../assets/BmiHeading.svg';
-import { Salad, Dumbbell, Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass } from 'lucide-react';
+import { Salad, Dumbbell, Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass, Loader2 } from 'lucide-react';
 import foodTrack from '../assets/Dashboard/foodTrack.svg';
 import workoutSession from '../assets/Dashboard/workoutSession.svg';
 import Quick from '../assets/Dashboard/quick.svg';
@@ -17,6 +17,7 @@ import BottomNavBar from "../components/BottomNavBar";
 const Dashboard = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ----------- State ----------- //
   const [user, setUser] = useState(null);
@@ -70,7 +71,8 @@ const Dashboard = () => {
       console.log(`Workout Action Quality: ${details.actionPoints}/15`);
     } catch (err) {
       console.error("Error fetching strength score", err);
-    }};
+    }
+  };
 
   useEffect(() => {
     fetchStrengthScore();
@@ -89,6 +91,7 @@ const Dashboard = () => {
   // Add water entry
   const handleAddWater = async () => {
     if (!waterInput || isNaN(waterInput) || waterInput <= 0) return;
+    setIsSubmitting(true);
 
     try {
       await axios.post(`https://nutriwings.onrender.com/api/water/add/${userId}`, {
@@ -99,6 +102,9 @@ const Dashboard = () => {
       setRefresh(prev => !prev); // <--- refetch trigger
     } catch (error) {
       console.error('Error adding water entry:', error);
+    }
+    finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -479,7 +485,7 @@ const Dashboard = () => {
           <span>We use your Nutritional intake, Workout reps & failures to measure this metric</span>
         </div>
 
-        <button className="toggleButton"  onClick={() => navigate("/strength-metrics")}>Analyse<ArrowRight/></button>
+        <button className="toggleButton" onClick={() => navigate("/strength-metrics")}>Analyse<ArrowRight /></button>
       </div>
 
       <motion.div className="otherMetrics" initial="hidden" animate="visible" variants={popInEffect}>
@@ -553,7 +559,12 @@ const Dashboard = () => {
                   value={waterInput}
                   onChange={(e) => setWaterInput(e.target.value)}
                 />
-                <button onClick={handleAddWater}><CirclePlus color="white" /></button>
+                <button
+                  onClick={handleAddWater}
+                  className="save-button"
+                  disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 color="white" size={12} /> : <CirclePlus color="white" />}
+                </button>
               </div>
 
             </div>
