@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ProfileIcon from '../assets/Profile.svg'
-import { User, Settings, LogOut } from "lucide-react"; 
+import { User, Settings, LogOut } from "lucide-react";
 import NutriLoader from '../components/NutriLoader'
 
 const AuthorNavbar = () => {
@@ -41,26 +41,30 @@ const AuthorNavbar = () => {
     return (
         <div className="authorNavbar">
             {loading ? (
-            <NutriLoader />
-          ) : (
-            <div className="userInfo">
-                <button className="profileButton" onClick={() => navigate("/profile")}>
-                    <img src={ProfileIcon} alt="" />
-                </button>
-                <div className="userDetails">
-                    <span style={{ fontSize: '16px', fontWeight: '600', color: '#5BA2FE' }}>Hey, {user.name || "User"}</span>
-                    <div className="desc">
-                        <span style={{ fontSize: '14px' }}>{user.age || "Not Given"} ,</span>
-                        <span style={{ fontSize: '14px' }}>{user.healthDetails?.lifestyle || "Not Given"}</span>
+                <NutriLoader />
+            ) : (
+                <div>
+
+                    <div className="userInfo">
+                        <button className="profileButton" onClick={() => navigate("/profile")}>
+                            <img src={ProfileIcon} alt="" />
+                        </button>
+                        <div className="userDetails">
+                            <span style={{ fontSize: '16px', fontWeight: '600', color: '#5BA2FE' }}>Hey, {user.name || "User"}</span>
+                            <div className="desc">
+                                <span style={{ fontSize: '14px' }}>{user.age || "Not Given"} ,</span>
+                                <span style={{ fontSize: '14px' }}>{user.healthDetails?.lifestyle || "Not Given"}</span>
+                            </div>
+                        </div>
                     </div>
+                    <div className="navbarActions">
+                        <button className="logoutButton" onClick={handleLogout}>
+                            <LogOut size={20} />
+                        </button>
+                    </div>
+
                 </div>
-            </div>,
-            <div className="navbarActions">
-                <button className="logoutButton" onClick={handleLogout}>
-                    <LogOut size={20} />
-                </button>
-            </div>            
-          )}
+            )}
         </div>
     );
 };
