@@ -108,7 +108,6 @@ const Dashboard = () => {
       await axios.delete(`https://nutriwings.onrender.com/api/water/delete/${userId}/${entryId}`);
       fetchWaterEntries(); // refresh
       setRefresh(prev => !prev); // <--- refetch trigger
-      setTotalSleepDuration()
     } catch (error) {
       console.error('Error deleting entry:', error);
     }
