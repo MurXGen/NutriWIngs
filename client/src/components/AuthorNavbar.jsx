@@ -37,12 +37,11 @@ const AuthorNavbar = () => {
         }
     };
 
-
-    if (loading) return <p>Loading...</p>;
-    if (!user) return null; // Don't render navbar if no user data
-
     return (
         <div className="authorNavbar">
+            {loading ? (
+            <NutriLoader />
+          ) : (
             <div className="userInfo">
                 <button className="profileButton" onClick={() => navigate("/profile")}>
                     <img src={ProfileIcon} alt="" />
@@ -54,12 +53,13 @@ const AuthorNavbar = () => {
                         <span style={{ fontSize: '14px' }}>{user.healthDetails?.lifestyle || "Not Given"}</span>
                     </div>
                 </div>
-            </div>
+            </div>,
             <div className="navbarActions">
                 <button className="logoutButton" onClick={handleLogout}>
                     <LogOut size={20} />
                 </button>
-            </div>
+            </div>            
+          )}
         </div>
     );
 };
