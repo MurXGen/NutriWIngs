@@ -457,17 +457,13 @@ const Dashboard = () => {
 
 
   // ----------- Return JSX ----------- //
-  if (loading) return <p>Loading...</p>;
+  if (loading || !user) return <p>Loading...</p>;
   if (!user) return <Navigate to="/welcome" />;
 
   return (
     <div className="dashboard">
 
         <AuthorNavbar />
-
-
-
-
       <div className="strengthCalculator">
         <div className="labelCont">
           <Sparkles color="#5ba2fe" size={"16px"} />
