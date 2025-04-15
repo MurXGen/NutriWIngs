@@ -12,7 +12,7 @@ import Proceed from '../assets/Dashboard/proceed.svg';
 import Sleep from '../assets/Dashboard/sleepLabel.svg';
 import Muscle from '../assets/Dashboard/Muscle.svg';
 import BottomNavBar from "../components/BottomNavBar";
-import NutriLoader from '../components/NutriLoader'
+
 // =================== Component =================== //
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -457,13 +457,16 @@ const Dashboard = () => {
 
 
   // ----------- Return JSX ----------- //
-  if (loading) return <p>Loading</p>;
+  if (loading) return <p>Loading...</p>;
   if (!user) return <Navigate to="/welcome" />;
 
   return (
     <div className="dashboard">
 
-      <AuthorNavbar />
+        <AuthorNavbar />
+
+
+
 
       <div className="strengthCalculator">
         <div className="labelCont">
