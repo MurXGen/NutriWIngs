@@ -17,6 +17,7 @@ import BottomNavBar from "../components/BottomNavBar";
 const Dashboard = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ----------- State ----------- //
   const [user, setUser] = useState(null);
