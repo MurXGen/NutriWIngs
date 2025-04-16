@@ -14,8 +14,8 @@ const DietHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [recomCal, setRecomCal] = useState(2000); // Default value
-  const [dailyCalories, setDailyCalories] = useState({}); // { date: totalCalories }
+  const [recomCal, setRecomCal] = useState(2000);
+  const [dailyCalories, setDailyCalories] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,29 +24,29 @@ const DietHistory = () => {
         const userId = localStorage.getItem("userId");
         if (!userId) throw new Error("User ID not found. Please log in again.");
 
-        // Fetch diet history for the user
+       
         const response = await fetch(`https://nutriwings.onrender.com/api/diet/history?userId=${userId}`);
         if (!response.ok) throw new Error("Failed to fetch diet history");
         const data = await response.json();
         setHistory(data);
 
-        // Fetch RecomCal from the new API
+       
         const recomCalResponse = await fetch(`https://nutriwings.onrender.com/api/diet/recomcal?userId=${userId}`);
         if (recomCalResponse.ok) {
           const recomCalData = await recomCalResponse.json();
-          // Check if RecomCal is fetched correctly
+         
           console.log("Fetched RecomCal:", recomCalData);
 
           if (recomCalData.success) {
-            setRecomCal(recomCalData.recomCal); // Set RecomCal from the response
+            setRecomCal(recomCalData.recomCal);
           } else {
-            setRecomCal(2000); // Default value if RecomCal is not fetched properly
+            setRecomCal(2000);
           }
         } else {
           throw new Error("Failed to fetch RecomCal");
         }
 
-        // Calculate daily calories
+       
         const dailyCal = {};
         data.forEach(entry => {
           if (!dailyCal[entry.Date]) {
@@ -56,7 +56,7 @@ const DietHistory = () => {
         });
         setDailyCalories(dailyCal);
 
-        // Set the default selected date as today
+       
         const todayKey = new Date().toLocaleDateString("en-CA");
         setSelectedDate(todayKey);
         setTotalCalories(dailyCal[todayKey] || 0);
@@ -105,7 +105,7 @@ const DietHistory = () => {
 
   const handleEdit = (dietId) => {
     if (!dietId) return;
-    navigate(`/log-diet?dietId=${dietId}`); // Pass dietId as query param
+    navigate(`/log-diet?dietId=${dietId}`);
   };
 
   const handleDelete = async (dietId) => {
@@ -113,21 +113,21 @@ const DietHistory = () => {
     if (!userId || !dietId) return;
 
     try {
-      // Send delete request
+     
       const res = await fetch(`https://nutriwings.onrender.com/api/diet/delete/${userId}/${dietId}`, {
         method: "DELETE",
       });
 
       if (!res.ok) throw new Error("Failed to delete diet entry");
 
-      // Fetch updated history after deletion
+     
       const updatedResponse = await fetch(`https://nutriwings.onrender.com/api/diet/history?userId=${userId}`);
       if (!updatedResponse.ok) throw new Error("Failed to fetch updated diet history");
 
       const updatedData = await updatedResponse.json();
       setHistory(updatedData);
 
-      // Refresh selected date's total calories
+     
       if (selectedDate) {
         const total = updatedData
           .filter((entry) => entry.Date === selectedDate)
@@ -143,7 +143,7 @@ const DietHistory = () => {
 
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-  const firstDayIndex = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay(); // 0 for Sun, 1 for Mon...
+  const firstDayIndex = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
   const today = new Date();
   const isCurrentMonthBeforeToday = currentMonth <= today;
 

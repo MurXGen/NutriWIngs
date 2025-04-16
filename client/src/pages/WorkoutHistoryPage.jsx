@@ -1,5 +1,5 @@
 import React from 'react';
-import WorkoutHistory from '../components/WorkoutHistory'; // Adjust path if needed
+import WorkoutHistory from '../components/WorkoutHistory';
 import AuthorNavbar from '../components/AuthorNavbar';
 import BottomNavBar from '../components/BottomNavBar';
 

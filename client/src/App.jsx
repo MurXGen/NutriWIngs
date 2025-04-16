@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile"; // Import Profile Page
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import DietTrack from "./pages/DietTrack";
 import LogDiet from "./pages/LogDiet";

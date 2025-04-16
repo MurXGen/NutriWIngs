@@ -83,8 +83,8 @@ router.get("/recomcal", async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Fetch recommended calorie intake from the healthDetails object
-    const recomCal = user.healthDetails?.RecomCal; // Default to 2000 if not set
+   
+    const recomCal = user.healthDetails?.RecomCal;
 
     res.json({ success: true, recomCal });
   } catch (error) {
@@ -98,14 +98,14 @@ router.put("/update/:userId", async (req, res) => {
     const { userId } = req.params;
     const { name, age, gender, healthDetails } = req.body;
 
-    // Find the user by ID
+   
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Update user details
+   
     user.name = name || user.name;
     user.age = age || user.age;
     user.gender = gender || user.gender;
@@ -113,10 +113,10 @@ router.put("/update/:userId", async (req, res) => {
       weight: healthDetails.weight || user.healthDetails.weight,
       height: healthDetails.height || user.healthDetails.height,
       lifestyle: healthDetails.lifestyle || user.healthDetails.lifestyle,
-      RecomCal: healthDetails.RecomCal || user.healthDetails.RecomCal, // Ensure RecomCal is updated
+      RecomCal: healthDetails.RecomCal || user.healthDetails.RecomCal,
     };
 
-    // Save the updated user
+   
     await user.save();
 
     res.json({ success: true, user });
@@ -143,7 +143,7 @@ router.get("/calorie-data", async (req, res) => {
     user.healthDiets.forEach((diet) => {
       const dietDate = new Date(diet.Date);
       if (dietDate.getFullYear() == year && dietDate.getMonth() + 1 == month) {
-        const dateKey = dietDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+        const dateKey = dietDate.toISOString().split("T")[0];
         calorieData[dateKey] = (calorieData[dateKey] || 0) + (diet.DietTaken?.CaloriesTaken || 0);
       }
     });

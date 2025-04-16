@@ -114,10 +114,10 @@ router.post("/register", async (req, res) => {
 
     await newUser.save();
 
-    // ✅ Set Cookie to Keep User Logged In
+   
     res.cookie("userId", newUser._id.toString(), {
       httpOnly: true,
-      secure: true, // Set to true in production
+      secure: true,
       sameSite:"None",
       maxAge:86400000,
     });

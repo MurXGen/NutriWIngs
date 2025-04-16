@@ -15,15 +15,15 @@ const LiveWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
-  const [workoutMode, setWorkoutMode] = useState(null); // "timer" or "manual"
-  const [duration, setDuration] = useState(""); // Store manual duration
+  const [workoutMode, setWorkoutMode] = useState(null);
+  const [duration, setDuration] = useState("");
   const [error, setError] = useState("");
   const [StartTimer, setStartTimer] = useState("");
 
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [currentEditingWorkout, setCurrentEditingWorkout] = useState(null);
 
-  // Add this function to handle template selection
+ 
   const handleTemplateSelect = (template) => {
     setCurrentWorkouts(prev =>
       prev.map(workout => {
@@ -91,7 +91,7 @@ const LiveWorkout = () => {
 
   const handleStop = async () => {
     for (let workout of currentWorkouts) {
-      // 🚨 Save the latest set before validation 🚨
+     
       if (workout.currentReps || workout.currentWeight) {
         workout.actions[workout.currentSet] = {
           reps: workout.currentReps,
@@ -100,7 +100,7 @@ const LiveWorkout = () => {
         };
       }
 
-      // 🚨 Validate input fields before stopping 🚨
+     
       if (!workout.workoutName.trim()) {
         setError("Please enter a Workout Name before stopping.");
         setTimeout(() => setError(""), 3000);
@@ -134,7 +134,7 @@ const LiveWorkout = () => {
       }
     }
 
-    // ✅ If all validations pass, proceed to save workout  
+   
     setHasStarted(false);
     setIsRunning(false);
     setIsPaused(false);
@@ -147,7 +147,7 @@ const LiveWorkout = () => {
     }));
 
     setWorkouts(prev => [...prev, ...completedWorkouts]);
-    setCurrentWorkouts([{ // Reset state
+    setCurrentWorkouts([{
       id: Date.now(),
       workoutName: "",
       imageUrl: "",
@@ -209,7 +209,7 @@ const LiveWorkout = () => {
 
   const handleRemoveWorkout = (id) => {
     if (currentWorkouts.length === 1) {
-      // Don't remove the last workout card
+     
       return;
     }
     setCurrentWorkouts(prev => prev.filter(workout => workout.id !== id));
@@ -223,7 +223,7 @@ const LiveWorkout = () => {
           const newActions = { ...workout.actions };
           delete newActions[setNumber];
 
-          // Re-sequence the sets
+         
           const actionKeys = Object.keys(newActions)
             .map(Number)
             .sort((a, b) => a - b);
@@ -237,7 +237,7 @@ const LiveWorkout = () => {
             };
           });
 
-          // Determine if we need to adjust currentSet
+         
           let newCurrentSet = workout.currentSet;
           if (setNumber < workout.currentSet) {
             newCurrentSet = Math.max(1, workout.currentSet - 1);
@@ -260,7 +260,7 @@ const LiveWorkout = () => {
     setCurrentWorkouts(prev =>
       prev.map(workout => {
         if (workout.id === workoutId) {
-          // Save the data of the current set before moving forward
+         
           const updatedActions = {
             ...workout.actions,
             [workout.currentSet]: {
@@ -289,7 +289,7 @@ const LiveWorkout = () => {
     setCurrentWorkouts(prev =>
       prev.map(workout => {
         if (workout.id === workoutId) {
-          // Save the current set's data first
+         
           const updatedActions = {
             ...workout.actions,
             [workout.currentSet]: {
@@ -299,7 +299,7 @@ const LiveWorkout = () => {
             }
           };
 
-          // Now switch to the selected set and load its data
+         
           const selectedSet = updatedActions[setNumber] || {
             reps: "",
             weight: "",
@@ -339,7 +339,7 @@ const LiveWorkout = () => {
     setCurrentWorkouts(prev =>
       prev.map(workout => {
         if (workout.id === workoutId) {
-          // Save the current input immediately into the actions object
+         
           const updatedActions = {
             ...workout.actions,
             [workout.currentSet]: {
@@ -351,8 +351,8 @@ const LiveWorkout = () => {
 
           return {
             ...workout,
-            [field]: value, // Update UI state for the input
-            actions: updatedActions, // Ensure Set 1 data is stored live
+            [field]: value,
+            actions: updatedActions,
           };
         }
         return workout;

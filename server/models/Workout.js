@@ -11,7 +11,7 @@ const WorkoutSchema = new mongoose.Schema({
     required: true,
   },
   duration: {
-    type: Number, // Total session duration in seconds
+    type: Number,
     required: true,
   },
   workouts: [

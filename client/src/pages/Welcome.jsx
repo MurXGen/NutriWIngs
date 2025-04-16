@@ -8,11 +8,11 @@ const Welcome = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    navigate("/login");  // Navigate to login page
+    navigate("/login"); 
   };
 
   const handleRegisterClick = () => {
-    navigate("/register");  // Navigate to register page
+    navigate("/register"); 
   };
 
   return (

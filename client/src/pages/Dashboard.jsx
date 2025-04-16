@@ -13,13 +13,13 @@ import Sleep from '../assets/Dashboard/sleepLabel.svg';
 import Muscle from '../assets/Dashboard/Muscle.svg';
 import BottomNavBar from "../components/BottomNavBar";
 
-// =================== Component =================== //
+// =================== Component ===================
 const Dashboard = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ----------- State ----------- //
+ 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bmi, setBmi] = useState(0);
@@ -36,16 +36,16 @@ const Dashboard = () => {
   const [showTimer, setShowTimer] = useState(false);
   const [showInput, setShowInput] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [totalSleepDuration, setTotalSleepDuration] = useState(0); // in seconds
+  const [totalSleepDuration, setTotalSleepDuration] = useState(0);
 
   const [durationValue, setDurationValue] = useState("");
-  const [durationUnit, setDurationUnit] = useState("hours"); // 'hours' or 'minutes'
+  const [durationUnit, setDurationUnit] = useState("hours");
 
   const [waterInput, setWaterInput] = useState(250);
   const [waterHistory, setWaterHistory] = useState([]);
 
   const [totalWater, setTotalWater] = useState(0);
-  const dailyGoal = 3000; // 3000ml per day
+  const dailyGoal = 3000;
   const [refresh, setRefresh] = useState(false);
 
   const [score, setScore] = useState(0);
@@ -56,7 +56,7 @@ const Dashboard = () => {
       const { totalScore, details } = res.data;
       setScore(totalScore);
 
-      console.clear(); // Optional: clears old logs for better visibility
+      console.clear();
       console.log("🔥 Strength Score Breakdown 🔥");
       console.log(`Total Score: ${totalScore}/100`);
       console.log("📊 Metric-wise:");
@@ -88,7 +88,7 @@ const Dashboard = () => {
     }
   };
 
-  // Add water entry
+ 
   const handleAddWater = async () => {
     if (!waterInput || isNaN(waterInput) || waterInput <= 0) return;
     setIsSubmitting(true);
@@ -97,9 +97,9 @@ const Dashboard = () => {
       await axios.post(`https://nutriwings.onrender.com/api/water/add/${userId}`, {
         waterContent: Number(waterInput),
       });
-      setWaterInput(250); // reset input
-      fetchWaterEntries(); // refresh
-      setRefresh(prev => !prev); // <--- refetch trigger
+      setWaterInput(250);
+      fetchWaterEntries();
+      setRefresh(prev => !prev);
     } catch (error) {
       console.error('Error adding water entry:', error);
     }
@@ -108,13 +108,13 @@ const Dashboard = () => {
     }
   };
 
-  // Delete entry
+ 
   const handleDeleteEntry = async (entryId) => {
     setIsSubmitting(true);
     try {
       await axios.delete(`https://nutriwings.onrender.com/api/water/delete/${userId}/${entryId}`);
-      fetchWaterEntries(); // refresh
-      setRefresh(prev => !prev); // <--- refetch trigger
+      fetchWaterEntries();
+      setRefresh(prev => !prev);
     } catch (error) {
       console.error('Error deleting entry:', error);
     } finally {
@@ -134,7 +134,7 @@ const Dashboard = () => {
     };
 
     if (userId) fetchTotalWater();
-  }, [userId, refresh]); // refetch on userId or refresh change
+  }, [userId, refresh]);
 
   const fillPercent = Math.min((totalWater / dailyGoal) * 100, 100);
   useEffect(() => {
@@ -154,13 +154,13 @@ const Dashboard = () => {
 
 
 
-  // ----------- Animation Variants ----------- //
+ 
   const popInEffect = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } }
   };
 
-  // ----------- Effects ----------- //
+ 
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
@@ -222,7 +222,7 @@ const Dashboard = () => {
         if (latest && latest.startDateTime && !latest.endDateTime) {
           const start = new Date(latest.startDateTime);
 
-          // ✅ Ensure startDateTime is a valid date
+         
           if (!isNaN(start.getTime())) {
             const diffInSeconds = Math.floor((Date.now() - start.getTime()) / 1000);
             setStartDateTime(latest.startDateTime);
@@ -273,7 +273,7 @@ const Dashboard = () => {
 
 
 
-  // ----------- Utility Functions ----------- //
+ 
   const calculateBMI = (weight, height) => {
     if (!weight || !height) return 0;
     const heightInMeters = height / 100;
@@ -324,7 +324,7 @@ const Dashboard = () => {
   }
 
 
-  // ----------- Handlers ----------- //
+ 
   const handleLogout = () => {
     localStorage.removeItem("userId");
     navigate("/login");
@@ -373,7 +373,7 @@ const Dashboard = () => {
       setShowTimer(false);
       setStartDateTime(null);
       setElapsedTime(0);
-      fetchSleepEntries(); // ✅ Refresh after timer stops
+      fetchSleepEntries();
     } catch (error) {
       console.error("Error stopping sleep:", error);
     } finally {
@@ -387,7 +387,7 @@ const Dashboard = () => {
     setShowTimer(false);
   };
 
-  // Submit duration with unit conversion
+ 
   const handleSubmitDuration = async () => {
     setIsSubmitting(true);
     try {
@@ -405,7 +405,7 @@ const Dashboard = () => {
 
       setDurationValue("");
       setShowInput(false);
-      fetchSleepEntries(); // Refresh after entry
+      fetchSleepEntries();
     } catch (error) {
       console.error("Error submitting manual sleep:", error);
     } finally {
@@ -413,12 +413,12 @@ const Dashboard = () => {
     }
   };
 
-  // Delete a specific entry
+ 
   const handleDeleteSleepEntry = async (entryId) => {
     setIsSubmitting(true);
     try {
       await axios.delete(`https://nutriwings.onrender.com/api/sleep/delete/${userId}/${entryId}`);
-      fetchSleepEntries(); // Refresh after delete
+      fetchSleepEntries();
     } catch (err) {
       console.error("Error deleting sleep entry:", err);
     } finally {
@@ -426,10 +426,10 @@ const Dashboard = () => {
     }
   };
 
-  // State to store manual entries
+ 
   const [sleepEntries, setSleepEntries] = useState([]);
 
-  // Fetch today's sleep entries
+ 
   const fetchSleepEntries = async () => {
     try {
       const res = await axios.get(`https://nutriwings.onrender.com/api/sleep/entries/${userId}`);
@@ -439,9 +439,9 @@ const Dashboard = () => {
 
       setSleepEntries(entries);
 
-      // ✅ Calculate total duration from all entries
+     
       const total = entries.reduce((sum, entry) => sum + (entry.totalDuration || 0), 0);
-      setTotalSleepDuration(total); // 👈 this updates your UI
+      setTotalSleepDuration(total);
     } catch (error) {
       console.error("Error fetching sleep entries:", error);
     }
@@ -456,7 +456,7 @@ const Dashboard = () => {
 
 
 
-  // ----------- Return JSX ----------- //
+ 
   if (loading) return <p>Loading...</p>;
   if (!user) return <Navigate to="/welcome" />;
 

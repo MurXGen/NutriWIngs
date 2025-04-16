@@ -116,7 +116,7 @@ const LogDiet = () => {
     setDiet((prevDiet) => {
       const updatedDiet = { ...prevDiet, [name]: value };
 
-      // Recalculate total calories when macros change
+     
       if (["carbs", "protein", "fats"].includes(name)) {
         updatedDiet.totalCalories = calculateCalories(
           parseFloat(updatedDiet.carbs) || 0,
@@ -129,18 +129,18 @@ const LogDiet = () => {
     });
   };
 
-  // Handle File Selection
+ 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     try {
-      // Compress the image before uploading
+     
       const options = { maxSizeMB: 0.5, maxWidthOrHeight: 800, useWebWorker: true };
       const compressedFile = await imageCompression(file, options);
       setImageFile(compressedFile);
 
-      // Show preview
+     
       const imageURL = URL.createObjectURL(compressedFile);
       setPreviewImage(imageURL);
     } catch (error) {
@@ -149,7 +149,7 @@ const LogDiet = () => {
     }
   };
 
-  // Upload Image to Cloudinary
+ 
   const uploadImage = async () => {
     if (!imageFile) return null;
 
@@ -180,14 +180,14 @@ const LogDiet = () => {
       return;
     }
 
-    // If "Save as Draft" is clicked, ensure an image is present
+   
     if (status === "Draft" && !imageFile && !diet.imageUrl) {
       setError("Image is required to save as a draft.");
       setLoading(false);
       return;
     }
 
-    // If "Save" is clicked, ensure all required fields are filled
+   
     if (status === "Saved") {
       const requiredFields = ["foodName", "portionSize", "portionSizeTaken", "carbs", "protein", "fats", "date", "time"];
       if (requiredFields.some((field) => !diet[field]?.toString().trim())) {
@@ -196,7 +196,7 @@ const LogDiet = () => {
         return;
       }
 
-      // Ensure an image is present
+     
       if (!imageFile && !diet.imageUrl) {
         setError("Image is required to save the diet.");
         setLoading(false);
@@ -204,7 +204,7 @@ const LogDiet = () => {
       }
     }
 
-    // Upload Image if a new one is selected
+   
     let uploadedImageUrl = diet.imageUrl;
     if (imageFile) {
       uploadedImageUrl = await uploadImage();
@@ -214,7 +214,7 @@ const LogDiet = () => {
       }
     }
 
-    // Construct the diet object
+   
     const dietData = {
       userId,
       foodName: diet.foodName || "",
@@ -226,7 +226,7 @@ const LogDiet = () => {
       totalCalories: roundToOneDecimal(diet.totalCalories) || 0,
       date: diet.date || "",
       time: diet.time || "",
-      dietStatus: status, // Assign "Draft" or "Saved" based on button clicked
+      dietStatus: status,
       imageUrl: uploadedImageUrl,
     };
 
@@ -370,7 +370,7 @@ const LogDiet = () => {
             placeholder="Food Name"
             onChange={(e) => {
               const value = e.target.value;
-              handleChange(e); // Update state
+              handleChange(e);
 
               clearTimeout(searchTimeout);
               const timeout = setTimeout(() => fetchFoods(value), 500);

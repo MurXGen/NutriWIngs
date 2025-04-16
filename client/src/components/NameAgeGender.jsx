@@ -14,9 +14,9 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
   const [selectedDay, setSelectedDay] = useState(data.day || "");
   const [selectedMonth, setSelectedMonth] = useState(data.month || "");
   const [selectedYear, setSelectedYear] = useState(data.year || "");
-  const [age, setAge] = useState(data.age || ""); // Store calculated age
+  const [age, setAge] = useState(data.age || ""); 
 
-  // Generate days dynamically based on selected month and year
+  
   const generateDays = (month, year) => {
     if (!month || !year) return [];
     const daysInMonth = new Date(year, month, 0).getDate();
@@ -31,7 +31,7 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
 
   const years = Array.from({ length: currentYear - 1899 }, (_, i) => 1970 + i);
 
-  // Ensure selected date does not exceed current date
+  
   useEffect(() => {
     if (selectedYear === currentYear && selectedMonth > currentMonth) {
       setSelectedMonth(currentMonth);
@@ -48,7 +48,7 @@ const NameAgeGender = ({ data, onChange, onNext }) => {
   }, [age]);
 
 
-  // Calculate age when all three values are selected
+  
   useEffect(() => {
     if (selectedYear && selectedMonth && selectedDay) {
       let calculatedAge = currentYear - selectedYear;

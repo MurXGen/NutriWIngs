@@ -74,10 +74,10 @@ const Weight = ({ data, onChange, onNext, onPrev }) => {
           {error && (
             <motion.span
               className="error"
-              initial={{ scale: 0, opacity: 0 }} // Start small and invisible
-              animate={{ scale: 1, opacity: 1 }} // Pop out to full size
-              exit={{ scale: 0, opacity: 0 }} // Shrink and fade out
-              transition={{ type: "spring", stiffness: 300, damping: 20 }} // Spring animation
+              initial={{ scale: 0, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              exit={{ scale: 0, opacity: 0 }} 
+              transition={{ type: "spring", stiffness: 300, damping: 20 }} 
             >
               <MessageCircleWarning /> {error}
             </motion.span>

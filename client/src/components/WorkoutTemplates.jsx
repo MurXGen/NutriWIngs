@@ -14,7 +14,7 @@ const WorkoutTemplates = () => {
 
   const API_KEY = "8475311212msh7e0f4801aeee83cp189f89jsnd728e30a048c";
 
-  // Function to fetch workouts from API
+ 
   const fetchWorkouts = useCallback(async (retryCount = 3) => {
     setLoading(true);
     setError(null);
@@ -55,7 +55,7 @@ const WorkoutTemplates = () => {
     }
   }, [category]);
 
-  // Fetch data on category change (First check cache, then API)
+ 
   useEffect(() => {
     const cachedData = localStorage.getItem(`workouts_${category}`);
     if (cachedData) {
@@ -66,7 +66,7 @@ const WorkoutTemplates = () => {
     }
   }, [category, fetchWorkouts]);
 
-  // Filter workouts based on search input
+ 
   useEffect(() => {
     if (workouts.length === 0) return;
 

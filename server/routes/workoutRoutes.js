@@ -35,13 +35,13 @@ router.delete("/delete-session", deleteWorkoutSession);
 
 router.get('/templates', async (req, res, next) => {
     try {
-        console.log('Fetching workout templates...'); // Debug log
+        console.log('Fetching workout templates...');
         const templates = await WorkoutTemplate.find({});
-        console.log('Found templates:', templates); // Debug log
+        console.log('Found templates:', templates);
         res.json(templates);
     } catch (error) {
         console.error('Error in /templates route:', error);
-        next(error); // Pass to error handler
+        next(error);
     }
 });
 

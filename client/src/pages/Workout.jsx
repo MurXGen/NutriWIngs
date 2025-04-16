@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
+import { useNavigate } from "react-router-dom";
 import WorkoutTemplates from "../components/WorkoutTemplates";
 import WorkoutHistory from "../components/WorkoutHistory";
 import BottomNavBar from "../components/BottomNavBar";
@@ -7,14 +7,11 @@ import AuthorNavbar from "../components/AuthorNavbar";
 import { MoveRight, History } from "lucide-react";
 
 const Workout = () => {
-  const navigate = useNavigate(); // ✅ Hook for navigation
+  const navigate = useNavigate();
 
   return (
     <div className="workoutContainer">
       <AuthorNavbar />
-
-
-      {/* ✅ Navigation Buttons */}
       <div className="actionButtons">
         <button onClick={() => navigate("/loglive-workout")}>Log Workout<MoveRight /></button>
         <button onClick={() => navigate("/workout-history")}>History<History /></button>

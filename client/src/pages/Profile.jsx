@@ -48,7 +48,7 @@ const Profile = () => {
   };
 
   const calculateRecomCal = (weight, height, age, gender, lifestyle) => {
-    // Harris-Benedict Equation for BMR
+   
     let bmr;
     if (gender === "Male") {
       bmr = 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
@@ -56,7 +56,7 @@ const Profile = () => {
       bmr = 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
     }
 
-    // Adjust BMR based on lifestyle
+   
     let recomCal;
     switch (lifestyle) {
       case "Sedentary":
@@ -69,10 +69,10 @@ const Profile = () => {
         recomCal = bmr * 1.9;
         break;
       default:
-        recomCal = bmr * 1.2; // Default to sedentary
+        recomCal = bmr * 1.2;
     }
 
-    // Round off the result to the nearest integer
+   
     return Math.round(recomCal);
   };
 
@@ -86,7 +86,7 @@ const Profile = () => {
         updatedDetails.lifestyle
       );
 
-      console.log("Rounded RecomCal:", recomCal); // Log the rounded value
+      console.log("Rounded RecomCal:", recomCal);
 
       const updatePayload = {
         ...updatedDetails,
@@ -94,7 +94,7 @@ const Profile = () => {
           weight: updatedDetails.weight,
           height: updatedDetails.height,
           lifestyle: updatedDetails.lifestyle,
-          RecomCal: recomCal, // Rounded value
+          RecomCal: recomCal,
         },
       };
 
@@ -118,7 +118,7 @@ const Profile = () => {
   const handleLogout = async () => {
     try {
       const response = await axios.post("https://nutriwings.onrender.com/api/auth/logout", {}, { withCredentials: true });
-      console.log("Logout successful:", response.data); // Log success message
+      console.log("Logout successful:", response.data);
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error.response ? error.response.data : error.message);

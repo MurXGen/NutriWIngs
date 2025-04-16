@@ -32,7 +32,7 @@ const LazyWorkoutGif = ({ src, alt }) => {
 
   useEffect(() => {
     if (isInView && !hasLoaded) {
-      // Show loading for 1 second before displaying GIF
+     
       loadingTimer.current = setTimeout(() => {
         setHasLoaded(true);
       }, 1000);
@@ -74,7 +74,7 @@ const WorkoutTemplateSelector = ({ onSelectTemplate }) => {
         
         setTemplates(data);
         
-        // Extract unique categories
+       
         const uniqueCategories = ['All', ...new Set(data.map(t => t.category))];
         setCategories(uniqueCategories);
         

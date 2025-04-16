@@ -56,7 +56,7 @@ const StrengthMetrics = () => {
                 });
             }
         }
-    }, [currentDate]); // Re-run when month changes
+    }, [currentDate]);
 
 
 
@@ -144,18 +144,18 @@ const StrengthMetrics = () => {
     const fetchAllDatesWithData = async () => {
         try {
             const res = await axios.get(`https://nutriwings.onrender.com/api/strength/dates/${userId}`);
-            setDatesWithData(res.data.dates || []);  // Store the dates with data in state
+            setDatesWithData(res.data.dates || []); 
         } catch (err) {
             console.error("Failed to fetch active strength dates", err);
         }
     };
 
     useEffect(() => {
-        if (userId) fetchAllDatesWithData();  // Trigger the fetch when userId changes
+        if (userId) fetchAllDatesWithData(); 
     }, [userId]);
 
 
-    // Check if date has data
+   
     const isDataDate = (date) => {
         return datesWithData.some(d => new Date(d).toDateString() === date.toDateString());
     };

@@ -15,7 +15,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Reset error state
+    setError("");
 
     try {
       const response = await axios.post("https://nutriwings.onrender.com/api/auth/login", {
@@ -25,10 +25,10 @@ const Login = () => {
 
       console.log("Login Successful:", response.data);
 
-      // ✅ Store userId in localStorage
+     
       localStorage.setItem("userId", response.data.userId);
 
-      navigate("/"); // Redirect to Dashboard on success
+      navigate("/");
     } catch (err) {
       console.error("Login Error:", err.response?.data?.message || "Server error");
       setError(err.response?.data?.message || "Something went wrong");

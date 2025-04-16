@@ -2,8 +2,8 @@ const Workout = require("../models/Workout");
 
 exports.saveWorkout = async (req, res) => {
   try {
-    const { userId } = req.cookies; // Extract userId from cookies
-    const { workouts, duration, startTime } = req.body; // Extract workouts from request body
+    const { userId } = req.cookies;
+    const { workouts, duration, startTime } = req.body;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: No user ID found" });

@@ -15,15 +15,15 @@ router.post("/sleep/stop", stopSleep);
 router.post("/sleep/manual", manualSleepEntry);
 
 router.get("/sleep/latest/:userId", getLatestSleep);
-router.get("/daily-metrics", getDailyMetrics); // Fetch today's metrics
+router.get("/daily-metrics", getDailyMetrics);
 
-// Water Track
+
 
 router.post('/water/add/:userId', addWaterEntry);
 router.get('/water/today/:userId', getTodaysWaterEntries);
 router.delete('/water/delete/:userId/:entryId', deleteWaterEntry);
 
-// Progress Metrics
+
 
 router.get("/strength/daily-score/:userId", calculateStrengthScore);
 

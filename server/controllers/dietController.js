@@ -8,13 +8,13 @@ const logDiet = async (req, res) => {
       userId, foodName, date, time, dietStatus, portionSize, totalCalories, carbs, protein, fats, portionSizeTaken, imageUrl 
     } = req.body;
 
-    // Validate user existence
+   
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    let finalImageUrl = imageUrl || ""; // Use imageUrl from frontend if available
+    let finalImageUrl = imageUrl || "";
 
-    // Upload image to Cloudinary only if no imageUrl is provided from frontend
+   
     if (!imageUrl && req.file) {
       try {
         const result = await cloudinary.uploader.upload(req.file.path);
@@ -25,10 +25,10 @@ const logDiet = async (req, res) => {
       }
     }
 
-    // Function to round values to 1 decimal place
+   
     const roundToOneDecimal = (num) => isNaN(num) ? 0 : parseFloat(num.toFixed(1));
 
-    // Convert and round values
+   
     const portionSizeNum = roundToOneDecimal(parseFloat(portionSize) || 0);
     const portionSizeTakenNum = roundToOneDecimal(parseFloat(portionSizeTaken) || 0);
     const totalCaloriesNum = roundToOneDecimal(parseFloat(totalCalories) || 0);
@@ -36,7 +36,7 @@ const logDiet = async (req, res) => {
     const proteinNum = roundToOneDecimal(parseFloat(protein) || 0);
     const fatsNum = roundToOneDecimal(parseFloat(fats) || 0);
 
-    // Calculate DietTaken values
+   
     let dietTaken = {
       CaloriesTaken: 0,
       PortionSizeTaken: portionSizeTakenNum,
@@ -53,7 +53,7 @@ const logDiet = async (req, res) => {
       dietTaken.Fats = roundToOneDecimal(ratio * fatsNum);
     }
 
-    // Create new diet entry
+   
     const newDiet = {
       DietID: Date.now().toString(),
       FoodName: foodName,
@@ -65,11 +65,11 @@ const logDiet = async (req, res) => {
       Carbs: carbsNum,
       Protein: proteinNum,
       Fats: fatsNum,
-      ImageUrl: finalImageUrl,  // Save the correct image URL
+      ImageUrl: finalImageUrl, 
       DietTaken: dietTaken
     };
 
-    // Add diet entry to user's healthDiets array
+   
     user.healthDiets.push(newDiet);
     await user.save();
 
@@ -86,7 +86,7 @@ const deleteDietEntry = async (req, res) => {
   try {
     console.log(`Attempting to delete diet entry for userId: ${userId}, dietId: ${dietId}`);
 
-    // Step 1: Find the user
+   
     const user = await User.findById(userId);
     if (!user) {
       console.log("User not found");
@@ -95,11 +95,11 @@ const deleteDietEntry = async (req, res) => {
 
     console.log("User found. Diet entries before deletion:", user.healthDiets.length);
 
-    // Step 2: Filter out the diet with matching DietID
+   
     const initialLength = user.healthDiets.length;
     user.healthDiets = user.healthDiets.filter(diet => diet.DietID !== dietId);
 
-    // Step 3: Check if deletion happened
+   
     if (user.healthDiets.length === initialLength) {
       console.log("DietID not found in user's healthDiets");
       return res.status(404).json({ message: "Diet entry not found" });
@@ -122,8 +122,8 @@ const getDietById = async (req, res) => {
   const { dietId } = req.params;
   try {
     const user = await User.findOne(
-      { "healthDiets.DietID": dietId.toString() }, // Convert to String
-      { "healthDiets.$": 1 } // Projection to return only matched diet
+      { "healthDiets.DietID": dietId.toString() },
+      { "healthDiets.$": 1 }
     );
 
     if (!user || !user.healthDiets.length) {
@@ -131,7 +131,7 @@ const getDietById = async (req, res) => {
     }
     res.json(user.healthDiets[0]);
   } catch (error) {
-    console.error("Error fetching diet:", error); // Debugging
+    console.error("Error fetching diet:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
@@ -143,15 +143,15 @@ const updateDiet = async (req, res) => {
     } = req.body;
     const { dietId } = req.params;
 
-    console.log("Received update request:", req.body); // ✅ Console log to verify request data
+    console.log("Received update request:", req.body);
 
-    // Validate user existence
+   
     const user = await User.findOne({ "healthDiets.DietID": dietId });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    let finalImageUrl = imageUrl || ""; // Use existing image URL
+    let finalImageUrl = imageUrl || "";
 
-    // Upload image to Cloudinary if a new file is provided
+   
     if (!imageUrl && req.file) {
       try {
         const result = await cloudinary.uploader.upload(req.file.path);
@@ -162,17 +162,17 @@ const updateDiet = async (req, res) => {
       }
     }
 
-    // Map diet status
+   
     const dietStatusMap = {
       saved: "Saved",
       draft: "Draft"
     };
     const validatedDietStatus = dietStatusMap[dietStatus] || "Saved";
 
-    // Function to round values
+   
     const roundToOneDecimal = (num) => isNaN(num) ? 0 : parseFloat(num.toFixed(1));
 
-    // Convert and round values
+   
     const portionSizeNum = roundToOneDecimal(parseFloat(portionSize) || 0);
     const portionSizeTakenNum = roundToOneDecimal(parseFloat(portionSizeTaken) || 0);
     const totalCaloriesNum = roundToOneDecimal(parseFloat(totalCalories) || 0);
@@ -180,7 +180,7 @@ const updateDiet = async (req, res) => {
     const proteinNum = roundToOneDecimal(parseFloat(protein) || 0);
     const fatsNum = roundToOneDecimal(parseFloat(fats) || 0);
 
-    // Calculate DietTaken values
+   
     let dietTaken = {
       CaloriesTaken: 0,
       PortionSizeTaken: portionSizeTakenNum,
@@ -197,7 +197,7 @@ const updateDiet = async (req, res) => {
       dietTaken.Fats = roundToOneDecimal(ratio * fatsNum);
     }
 
-    // Update the diet entry inside `healthDiets`
+   
     const updatedDiet = await User.findOneAndUpdate(
       { "healthDiets.DietID": dietId },
       {
@@ -231,7 +231,7 @@ const updateDiet = async (req, res) => {
 
 const getDietHistory = async (req, res) => {
   try {
-    const { userId } = req.query; // FIXED: Extract userId from query, not params
+    const { userId } = req.query;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
@@ -242,7 +242,7 @@ const getDietHistory = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user.healthDiets || []); // Return diet history
+    res.json(user.healthDiets || []);
   } catch (error) {
     console.error("Error fetching diet history:", error);
     res.status(500).json({ message: "Server error", error: error.message });

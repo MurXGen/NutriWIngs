@@ -9,7 +9,7 @@ const AuthorNavbar = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // Fetch user details
+    
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
@@ -17,7 +17,7 @@ const AuthorNavbar = () => {
                 setUser(response.data);
             } catch (error) {
                 console.error("Error fetching user session:", error);
-                navigate("/login"); // Redirect to login if user is not authenticated
+                navigate("/login"); 
             } finally {
                 setLoading(false);
             }
@@ -26,11 +26,11 @@ const AuthorNavbar = () => {
         fetchUserDetails();
     }, [navigate]);
 
-    // Handle logout
+    
     const handleLogout = async () => {
         try {
             const response = await axios.post("https://nutriwings.onrender.com/api/auth/logout", {}, { withCredentials: true });
-            console.log("Logout successful:", response.data); // Log success message
+            console.log("Logout successful:", response.data); 
             navigate("/login");
         } catch (error) {
             console.error("Logout failed:", error.response ? error.response.data : error.message);
@@ -38,7 +38,7 @@ const AuthorNavbar = () => {
     };
 
     if (loading) return <p>Loading...</p>;
-    if (!user) return null; // Don't render navbar if no user data
+    if (!user) return null; 
 
     return (
         <div className="authorNavbar">

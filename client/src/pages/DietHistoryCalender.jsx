@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "../DietHistoryCalender.css"; // Custom styles for red highlight
+import "../DietHistoryCalender.css";
 
 const DietHistoryCalendar = () => {
   const [history, setHistory] = useState([]);
@@ -17,7 +17,7 @@ const DietHistoryCalendar = () => {
     fetchHistory();
   }, []);
 
-  // Group by date and calculate total calories per day
+ 
   const groupedDiets = history.reduce((acc, entry) => {
     const formattedDate = entry.Date && entry.Time
       ? new Date(`${entry.Date}T${entry.Time}`).toISOString().split("T")[0]
@@ -31,9 +31,9 @@ const DietHistoryCalendar = () => {
     return acc;
   }, {});
 
-  // Handle date selection
+ 
   const handleDateChange = (date) => {
-    // Format to YYYY-MM-DD (avoiding timezone issues)
+   
     const selectedDateKey = date.toLocaleDateString("en-CA"); 
   
     setSelectedDate(selectedDateKey);
@@ -48,7 +48,7 @@ const DietHistoryCalendar = () => {
       <Calendar
         onChange={handleDateChange}
         value={selectedDate ? new Date(selectedDate) : new Date()}
-        maxDate={new Date()} // Disable future dates
+        maxDate={new Date()}
         tileClassName={({ date }) => {
           const dateKey = date.toISOString().split("T")[0];
           return groupedDiets[dateKey]?.totalCalories > 2000 ? "high-calories" : "";

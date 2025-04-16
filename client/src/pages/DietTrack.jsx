@@ -32,13 +32,13 @@ const DietTrack = () => {
   const [recomCal, setRecomCal] = useState(null);
   const [calorieData, setCalorieData] = useState({});
 
-  // Animation variants for pop-out effect
+ 
   const popOutVariants = {
     hidden: { scale: 0, opacity: 0 },
     visible: { scale: 1, opacity: 1 },
   };
 
-  // Transition for staggered animations
+ 
   const popOutTransition = {
     type: "spring",
     stiffness: 100,
@@ -262,7 +262,7 @@ const DietTrack = () => {
           <button
             onClick={() => {
               const now = new Date();
-              const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
+              const currentTime = now.toTimeString().slice(0, 5);
 
               navigate("/log-diet", {
                 state: {

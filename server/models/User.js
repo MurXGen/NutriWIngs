@@ -26,14 +26,14 @@ const RecoverySchema = new mongoose.Schema({
   waterIntake: [
     {
       recordDateTime: { type: Date, default: Date.now },
-      waterContent: { type: Number, required: true } // in ml
+      waterContent: { type: Number, required: true }
     }
   ],
   sleepTrack: [
     {
       startDateTime: { type: Date, default: null },
       endDateTime: { type: Date, default: null },
-      totalDuration: { type: Number } // in seconds
+      totalDuration: { type: Number }
     }
   ]
 });
