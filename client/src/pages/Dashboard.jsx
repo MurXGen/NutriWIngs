@@ -658,13 +658,12 @@ const Dashboard = () => {
               <div className="timerDisplay">
                 <span>{formatTime(elapsedTime)}</span>
                 <motion.button
-                  className="save-button"
                   disabled={isSubmitting}
                   onClick={handleStop}
                   whileTap={{ scale: 0.95 }}>
                     
-                  {isSubmitting ? <Loader2 size={12} /> : <StopCircle size={12}>}
-
+                  {isSubmitting ? <Loader2 size={12} /> : <StopCircle size={12}/>}
+              
                 </motion.button>
               </div>
 
