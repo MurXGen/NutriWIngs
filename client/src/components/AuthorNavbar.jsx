@@ -37,6 +37,9 @@ const AuthorNavbar = () => {
         }
     };
 
+    if (loading) return <p>Loading...</p>;
+    if (!user) return null; // Don't render navbar if no user data
+
     return (
         <div className="authorNavbar">
             <div className="userInfo">
