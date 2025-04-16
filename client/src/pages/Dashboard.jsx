@@ -662,8 +662,8 @@ const Dashboard = () => {
                   disabled={isSubmitting}
                   onClick={handleStop}
                   whileTap={{ scale: 0.95 }}>
-                  {isSubmitting ? <Loader2 size={12} /> : "Stop"}
-
+                    <span>Stop</span>
+                  {isSubmitting && <Loader2 size={12} />}
                 </motion.button>
               </div>
 
