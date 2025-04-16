@@ -20,6 +20,10 @@ const LogDiet = () => {
   const preselectedDate = location.state?.date;
   const preselectedTime = location.state?.time;
 
+  const [foodSuggestions, setFoodSuggestions] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
+
+
   const [diet, setDiet] = useState({
     foodName: "",
     portionSize: "",
@@ -42,7 +46,6 @@ const LogDiet = () => {
   const roundToOneDecimal = (value) => (value ? Math.round(value * 10) / 10 : 0);
   const calculateCalories = (carbs, protein, fats) =>
     roundToOneDecimal(carbs * 4 + protein * 4 + fats * 9);
-
   useEffect(() => {
     if (dietId) {
       const fetchDiet = async () => {
@@ -79,6 +82,29 @@ const LogDiet = () => {
       fetchDiet();
     }
   }, [dietId]);
+
+  const fetchFoods = async (query) => {
+    if (!query) return;
+
+    try {
+      const response = await axios.get(
+        `https://api.nal.usda.gov/fdc/v1/foods/search`,
+        {
+          params: {
+            query,
+            pageSize: 10,
+            api_key: "RV4ZuqZix53utUnrzVeXDvC8jP6Bz9a43yPIohPC",
+          },
+        }
+      );
+
+      setFoodSuggestions(response.data.foods || []);
+    } catch (error) {
+      console.error("USDA API Error:", error);
+      setFoodSuggestions([]);
+    }
+  };
+
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -245,7 +271,7 @@ const LogDiet = () => {
       </div>
 
       <div className="dateTimeForLog">
-        
+
         <label>
 
           <input
@@ -336,18 +362,61 @@ const LogDiet = () => {
 
         <div className="food_inputContainer">
 
-          <span><IceCreamBowl color="#5ba2fe" size={16}/>Food name</span>
+          <span><IceCreamBowl color="#5ba2fe" size={16} />Food name</span>
           <input
             type="text"
             name="foodName"
-            value={diet.foodName || ""}
+            value={diet.foodName}
             placeholder="Food Name"
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleChange(e); // Update state
+
+              clearTimeout(searchTimeout);
+              const timeout = setTimeout(() => fetchFoods(value), 500);
+              setSearchTimeout(timeout);
+            }}
+            autoComplete="off"
           />
+
+          {foodSuggestions.length > 0 && (
+            <ul className="food-suggestions">
+              {foodSuggestions.map((item) => (
+                <li
+                  key={item.fdcId}
+                  onClick={() => {
+                    const nutrients = item.foodNutrients || [];
+                    const getNutrient = (name) => {
+                      const nutrient = nutrients.find(n => n.nutrientName.toLowerCase().includes(name));
+                      return nutrient ? nutrient.value : 0;
+                    };
+
+                    const carbs = getNutrient("carbohydrate");
+                    const protein = getNutrient("protein");
+                    const fats = getNutrient("total lipid");
+
+                    setDiet(prev => ({
+                      ...prev,
+                      foodName: item.description,
+                      carbs: roundToOneDecimal(carbs),
+                      protein: roundToOneDecimal(protein),
+                      fats: roundToOneDecimal(fats),
+                      totalCalories: calculateCalories(carbs, protein, fats)
+                    }));
+
+                    setFoodSuggestions([]);
+                  }}
+                >
+                  {item.description}
+                </li>
+              ))}
+            </ul>
+          )}
+
         </div>
 
         <div className="food_inputContainer">
-          <span><NotepadTextDashed color="#5ba2fe" size={16}/>Nutritional Values</span>
+          <span><NotepadTextDashed color="#5ba2fe" size={16} />Nutritional Values</span>
           <input
             type="number"
             name="portionSize"

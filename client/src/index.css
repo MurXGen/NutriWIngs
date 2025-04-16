@@ -3168,3 +3168,30 @@ select {
 .date-box {
   scroll-snap-align: center;
 }
+
+
+.food-suggestions {
+  display: flex;
+  gap: 12px;
+  z-index: 2;
+  width: 100%;
+  max-height: 200px;
+  overflow-x: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.food-suggestions li {
+  display: flex;
+  min-width: 100px;
+  border-radius: var(--borderRSize-Small);
+  background-color: #ffffff;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: var(--font-size-Smalltext);
+}
+
+.food-suggestions li:hover {
+  background-color: #f0f0f0;
+}
