@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthorNavbar from "../components/AuthorNavbar";
 import BmiHeading from '../assets/BmiHeading.svg';
-import { StopCircle,Salad, Dumbbell, Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass, Loader2, StopCircle } from 'lucide-react';
+import { Salad, Dumbbell, Calculator, MoveLeft, BadgeInfo, Sparkles, Droplets, CircleX, CirclePlus, ArrowRight, Lamp, CircleFadingPlus, Hourglass, Loader2, StopCircle } from 'lucide-react';
 import foodTrack from '../assets/Dashboard/foodTrack.svg';
 import workoutSession from '../assets/Dashboard/workoutSession.svg';
 import Quick from '../assets/Dashboard/quick.svg';
