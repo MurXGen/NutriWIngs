@@ -2,9 +2,6 @@ const User = require("../models/User");
 const Workout = require("../models/Workout");
 const mongoose = require("mongoose");
 
-const User = require("../models/User");
-const Workout = require("../models/Workout");
-const mongoose = require("mongoose");
 
 // Helper function to get IST date ranges
 function getISTDayRange() {
