@@ -181,11 +181,11 @@ const LogDiet = () => {
     }
 
    
-    if (status === "Draft" && !imageFile && !diet.imageUrl) {
-      setError("Image is required to save as a draft.");
-      setLoading(false);
-      return;
-    }
+    // if (status === "Draft" && !imageFile && !diet.imageUrl) {
+    //   setError("Image is required to save as a draft.");
+    //   setLoading(false);
+    //   return;
+    // }
 
    
     if (status === "Saved") {
@@ -197,11 +197,11 @@ const LogDiet = () => {
       }
 
      
-      if (!imageFile && !diet.imageUrl) {
-        setError("Image is required to save the diet.");
-        setLoading(false);
-        return;
-      }
+      // if (!imageFile && !diet.imageUrl) {
+      //   setError("Image is required to save the diet.");
+      //   setLoading(false);
+      //   return;
+      // }
     }
 
    
@@ -227,7 +227,7 @@ const LogDiet = () => {
       date: diet.date || "",
       time: diet.time || "",
       dietStatus: status,
-      imageUrl: uploadedImageUrl,
+      imageUrl: uploadedImageUrl || "https://res.cloudinary.com/dhjplff89/image/upload/v1744490374/nutriwings-workouts/ymlg21xdmv8ekee0n8cf.png",
     };
 
     try {

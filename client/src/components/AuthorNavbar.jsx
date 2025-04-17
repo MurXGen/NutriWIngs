@@ -53,7 +53,7 @@ const AuthorNavbar = () => {
                         <span style={{ fontSize: '14px' }}>{user.healthDetails?.lifestyle || "Not Given"}</span>
                     </div>
                 </div>
-            </div>,
+            </div>
             <div className="navbarActions">
                 <button className="logoutButton" onClick={handleLogout}>
                     <LogOut size={20} />
