@@ -2,16 +2,35 @@ const User = require("../models/User");
 const Workout = require("../models/Workout");
 const mongoose = require("mongoose");
 
+const User = require("../models/User");
+const Workout = require("../models/Workout");
+const mongoose = require("mongoose");
+
+// Helper function to get IST date ranges
+function getISTDayRange() {
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+  const istNow = new Date(now.getTime() + istOffset);
+
+  // Get today's start in IST
+  const istToday = new Date(istNow);
+  istToday.setHours(0, 0, 0, 0);
+
+  // Convert IST midnight back to UTC for accurate comparison
+  const utcStartOfISTDay = new Date(istToday.getTime() - istOffset);
+  const utcEndOfISTDay = new Date(utcStartOfISTDay.getTime() + 24 * 60 * 60 * 1000 - 1);
+
+  return { start: utcStartOfISTDay, end: utcEndOfISTDay };
+}
+
 exports.getDailyMetrics = async (req, res) => {
   try {
     const userId = req.cookies.userId;
     console.log("User ID from cookie:", userId);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // Get IST day range
+    const { start: startOfDay, end: endOfDay } = getISTDayRange();
 
     const user = await User.findById(userId);
     if (!user) {
@@ -19,7 +38,6 @@ exports.getDailyMetrics = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-   
     const todayDiets = user.healthDiets.filter(diet => {
       const dietDate = new Date(diet.Date);
       return dietDate >= startOfDay && dietDate <= endOfDay && diet.DietTaken;
@@ -29,7 +47,6 @@ exports.getDailyMetrics = async (req, res) => {
       return total + (diet.DietTaken.CaloriesTaken || 0);
     }, 0);
 
-   
     const workouts = await Workout.find({
       userId: new mongoose.Types.ObjectId(userId),
       startTime: {
@@ -40,14 +57,12 @@ exports.getDailyMetrics = async (req, res) => {
 
     console.log("🏋️ All Workouts Today:", workouts);
 
-   
     const totalWorkoutDurationSeconds = workouts.reduce((sum, doc) => {
       return sum + (doc.duration || 0);
     }, 0);
 
     const totalWorkoutDurationMinutes = totalWorkoutDurationSeconds / 60;
 
-   
     const formattedCalories = Number(todayCalories.toFixed(1));
     const formattedDuration = Number(totalWorkoutDurationMinutes.toFixed(2));
 
@@ -64,9 +79,7 @@ exports.getDailyMetrics = async (req, res) => {
   }
 };
 
-
-
-// Start sleep
+// Start sleep (no timezone changes needed)
 exports.startSleep = async (req, res) => {
   const { userId } = req.body;
   const startDateTime = new Date();
@@ -83,7 +96,6 @@ exports.startSleep = async (req, res) => {
 
     console.log("✅ User found:", user._id);
 
-   
     if (!user.recoveryFactors) {
       console.log("⚠️ recoveryFactors missing. Initializing...");
       user.recoveryFactors = { sleepTrack: [] };
@@ -108,9 +120,7 @@ exports.startSleep = async (req, res) => {
   }
 };
 
-
-
-// Stop sleep
+// Stop sleep (no timezone changes needed)
 exports.stopSleep = async (req, res) => {
   const { userId } = req.body;
   const endDateTime = new Date();
@@ -144,8 +154,7 @@ exports.stopSleep = async (req, res) => {
   }
 };
 
-
-// Manual entry
+// Manual entry (no timezone changes needed)
 exports.manualSleepEntry = async (req, res) => {
   const { userId, duration, endDateTime } = req.body;
 
@@ -190,7 +199,6 @@ exports.getLatestSleep = async (req, res) => {
       return res.status(200).json({ message: "No sleep data found", latestSleep: null });
     }
 
-   
     const sortedEntries = sleepEntries
       .filter(entry => entry.totalDuration != null)
       .sort((a, b) => {
@@ -201,14 +209,12 @@ exports.getLatestSleep = async (req, res) => {
 
     let latestSleep = sortedEntries[0];
 
-   
     if (latestSleep?.startDateTime && !latestSleep.endDateTime) {
       const startTime = new Date(latestSleep.startDateTime);
       const currentTime = new Date();
       const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
 
       if (elapsedSeconds >= 12 * 60 * 60) {
-       
         latestSleep.endDateTime = currentTime;
         latestSleep.totalDuration = 10 * 60 * 60;
 
@@ -224,7 +230,6 @@ exports.getLatestSleep = async (req, res) => {
   }
 };
 
-
 exports.getTotalSleepDuration = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -234,17 +239,8 @@ exports.getTotalSleepDuration = async (req, res) => {
       return res.status(404).json({ message: "Sleep data not found" });
     }
 
-    // Get current time in IST
-    const now = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
-    const istNow = new Date(now.getTime() + istOffset);
-
-    // Get today's start in IST
-    const istToday = new Date(istNow);
-    istToday.setHours(0, 0, 0, 0);
-
-    // Convert IST midnight back to UTC for accurate comparison
-    const utcStartOfISTDay = new Date(istToday.getTime() - istOffset);
+    // Get IST day range
+    const { start: utcStartOfISTDay } = getISTDayRange();
 
     const totalDuration = user.recoveryFactors.sleepTrack.reduce((total, entry) => {
       const fallbackDate = entry._id.getTimestamp();
@@ -264,9 +260,6 @@ exports.getTotalSleepDuration = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-
-
 
 exports.deleteSleepEntry = async (req, res) => {
   const { userId, entryId } = req.params;
@@ -292,18 +285,14 @@ exports.getTodaysSleepEntries = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+    // Get IST day range
+    const { start: startOfDay, end: endOfDay } = getISTDayRange();
 
     const entries = user.recoveryFactors.sleepTrack.filter((entry, i) => {
       const fallbackDate = entry._id.getTimestamp();
       const entryDate = new Date(entry.createdAt || entry.startDateTime || fallbackDate);
       const hasValidDuration = !isNaN(entry.totalDuration) && entry.totalDuration > 0;
-      const isToday = entryDate >= todayStart && entryDate <= todayEnd;
-
-
+      const isToday = entryDate >= startOfDay && entryDate <= endOfDay;
 
       return hasValidDuration && isToday;
     });
@@ -318,10 +307,6 @@ exports.getTodaysSleepEntries = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch sleep entries." });
   }
 };
-
-
-
-
 
 exports.addWaterEntry = async (req, res) => {
   const { userId } = req.params;
@@ -353,11 +338,8 @@ exports.getTodaysWaterEntries = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // Get IST day range
+    const { start: startOfDay, end: endOfDay } = getISTDayRange();
 
     const entries = user.recoveryFactors.waterIntake.filter((entry) => {
       const date = new Date(entry.recordDateTime);
@@ -381,7 +363,6 @@ exports.deleteWaterEntry = async (req, res) => {
 
     res.status(200).json({ message: 'Entry deleted' });
   } catch (err) {
-
     res.status(500).json({ error: 'Failed to delete entry' });
   }
 };
@@ -389,9 +370,9 @@ exports.deleteWaterEntry = async (req, res) => {
 exports.calculateStrengthScore = async (req, res) => {
   try {
     const { userId } = req.params;
-    const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    // Get IST day range
+    const { start: startOfDay, end: endOfDay } = getISTDayRange();
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -399,7 +380,6 @@ exports.calculateStrengthScore = async (req, res) => {
     const { healthDetails, healthDiets, recoveryFactors } = user;
     const { weight, RecomCal } = healthDetails;
 
-   
     const todayDiets = healthDiets.filter(d => {
       const dietDate = new Date(d.Date);
       return dietDate >= startOfDay && dietDate <= endOfDay;
@@ -417,29 +397,22 @@ exports.calculateStrengthScore = async (req, res) => {
     const totalCals = (totalProtein * 4) + (totalCarbs * 4) + (totalFats * 9);
     const proteinTarget = weight;
 
-   
     const waterIntakeToday = recoveryFactors?.waterIntake?.filter(w =>
       new Date(w.recordDateTime) >= startOfDay && new Date(w.recordDateTime) <= endOfDay
     ).reduce((sum, w) => sum + w.waterContent, 0) || 0;
 
-   
     const sleepToday = recoveryFactors?.sleepTrack?.filter(s => {
       const hasDuration = s.totalDuration && s.totalDuration > 0;
-
       const endDate = s.endDateTime ? new Date(s.endDateTime) : null;
       const startDate = s.startDateTime ? new Date(s.startDateTime) : null;
-
       const isEndToday = endDate && endDate >= startOfDay && endDate <= endOfDay;
       const isStartToday = startDate && startDate >= startOfDay && startDate <= endOfDay;
-
       return hasDuration && (isEndToday || isStartToday);
     });
 
     const totalSleepSecs = sleepToday.reduce((sum, s) => sum + (s.totalDuration || 0), 0);
     const sleepHours = totalSleepSecs / 3600;
 
-
-   
     const todayWorkout = await Workout.find({
       userId,
       startTime: { $gte: startOfDay, $lte: endOfDay }
@@ -450,7 +423,6 @@ exports.calculateStrengthScore = async (req, res) => {
       startTime: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
     });
 
-   
     const totalTodayDurationSecs = todayWorkout.reduce((sum, w) => sum + (w.duration || 0), 0);
     const workoutDurationMins = totalTodayDurationSecs / 60;
     const durationPoints = Math.min((workoutDurationMins / 60) * 20, 20);
@@ -459,7 +431,7 @@ exports.calculateStrengthScore = async (req, res) => {
     const weeklyTotalDurationMins = totalWeeklyDurationSecs / 60;
     const consistencyPoints = weeklyTotalDurationMins >= 210 ? 5 : 0;
 
-   
+
     const intensitySleep = Math.min(sleepHours, 8);
     const intensityPoints = (intensitySleep / 8) * 7.5;
 
@@ -477,12 +449,12 @@ exports.calculateStrengthScore = async (req, res) => {
     const cappedFailures = Math.min(totalFailures, 4);
     const failurePoints = (cappedFailures / 4) * 7.5;
 
-   
+
     let todaysReps = 0, todaysWeight = 0, avgTodayWeight = 0;
     let lastWorkoutWeight = 0;
     let mainCategory = "";
 
-   
+
     todayWorkout.forEach(w => {
       w.workouts.forEach(wo => {
         mainCategory = wo.category;
@@ -495,7 +467,7 @@ exports.calculateStrengthScore = async (req, res) => {
 
     avgTodayWeight = todaysReps > 0 ? todaysWeight / todaysReps : 0;
 
-   
+
     const lastSimilarWorkout = weeklyWorkouts.reverse().find(w =>
       w.workouts.some(wo => wo.category === mainCategory)
     );
@@ -521,24 +493,24 @@ exports.calculateStrengthScore = async (req, res) => {
 
     actionPoints = Math.min(actionPoints, 15);
 
-   
+
     const proteinScore = Math.min((totalProtein / proteinTarget) * 20, 20);
     const waterScore = Math.min((waterIntakeToday / 3000) * 10, 10);
     const fatScore = (totalCals && (totalFats * 9 / totalCals <= 0.3)) ? 5 : 0;
     const carbScore = (totalCals && (totalCarbs * 4 / totalCals <= 0.5)) ? 10 : 0;
 
-   
+
     const totalScore = proteinScore + waterScore + fatScore + carbScore +
       durationPoints + consistencyPoints +
       intensityPoints + failurePoints + actionPoints;
 
-   
+
     user.StrengthScores = user.StrengthScores.filter(score => {
       const scoreDate = new Date(score.date).toDateString();
       return scoreDate !== new Date().toDateString();
     });
 
-   
+
     user.StrengthScores.push({
       date: new Date(),
       totalScore: Number(totalScore.toFixed(1)),
@@ -576,6 +548,8 @@ exports.calculateStrengthScore = async (req, res) => {
   }
 };
 
+// [Rest of the functions (getStrengthScoreByDate, getStrengthDates) remain unchanged]
+
 
 exports.getStrengthScoreByDate = async (req, res) => {
   const { userId, date } = req.params;
@@ -593,7 +567,7 @@ exports.getStrengthScoreByDate = async (req, res) => {
     console.log('Start of day:', startOfDay);
     console.log('End of day:', endOfDay);
 
-   
+
     const user = await User.findOne({
       _id: userId,
       "StrengthScores.date": { $gte: startOfDay, $lte: endOfDay }
@@ -604,7 +578,7 @@ exports.getStrengthScoreByDate = async (req, res) => {
       return res.status(404).json({ message: "No user found." });
     }
 
-   
+
     const scoreRecord = user.StrengthScores.find(score =>
       score.date >= startOfDay && score.date <= endOfDay
     );
@@ -644,20 +618,20 @@ exports.getStrengthScoreByDate = async (req, res) => {
 };
 
 exports.getStrengthDates = async (req, res) => {
-  const { userId } = req.params; 
+  const { userId } = req.params;
 
   try {
-   
+
     const user = await User.findById(userId).select('StrengthScores');
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
-   
+
     const datesWithData = user.StrengthScores.map(score => ({
-      date: score.date, 
-      totalScore: score.totalScore, 
+      date: score.date,
+      totalScore: score.totalScore,
       proteinScore: score.proteinScore,
       waterScore: score.waterScore,
       fatScore: score.fatScore,
@@ -669,7 +643,7 @@ exports.getStrengthDates = async (req, res) => {
       actionPoints: score.actionPoints
     }));
 
-   
+
     return res.json({ dates: datesWithData });
   } catch (err) {
     console.error(err);
