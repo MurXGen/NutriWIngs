@@ -234,17 +234,26 @@ exports.getTotalSleepDuration = async (req, res) => {
       return res.status(404).json({ message: "Sleep data not found" });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Get current time in IST
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+    const istNow = new Date(now.getTime() + istOffset);
 
-    const totalDuration = user.recoveryFactors.sleepTrack.reduce((total, entry, index) => {
+    // Get today's start in IST
+    const istToday = new Date(istNow);
+    istToday.setHours(0, 0, 0, 0);
+
+    // Convert IST midnight back to UTC for accurate comparison
+    const utcStartOfISTDay = new Date(istToday.getTime() - istOffset);
+
+    const totalDuration = user.recoveryFactors.sleepTrack.reduce((total, entry) => {
       const fallbackDate = entry._id.getTimestamp();
       const entryDate = new Date(entry.createdAt || entry.startDateTime || fallbackDate);
-
-      const isToday = entryDate >= today;
       const validDuration = !isNaN(entry.totalDuration);
 
-      return isToday && validDuration ? total + entry.totalDuration : total;
+      return entryDate >= utcStartOfISTDay && validDuration
+        ? total + entry.totalDuration
+        : total;
     }, 0);
 
     console.log("🧮 Total Duration (seconds):", totalDuration);
@@ -255,6 +264,7 @@ exports.getTotalSleepDuration = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 
 
