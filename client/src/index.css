@@ -27,45 +27,21 @@
   --paddingBox: 29px 32px;
 }
 
-@keyframes rotateButton {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+.proceed:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loader-icon {
+  animation: spin 1s linear infinite;
+  width: 20px;
+  height: 20px;
+}
+
+/* Rotate animation */
+@keyframes spin {
+  to {
     transform: rotate(360deg);
-  }
-}
-
-.save-button:disabled {
-  animation: rotateButton 1s linear infinite;
-  pointer-events: none; 
-  opacity: 0.7; 
-}
-
-/* NutriLoader.css */
-.nutri-loader-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100px; /* or whatever space the loading box should take */
-  width: 100%;
-}
-
-.nutri-loader-icon {
-  width: 60px;
-  height: 60px;
-  animation: pulseIcon 1.5s infinite ease-in-out;
-}
-
-@keyframes pulseIcon {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.3);
-  }
-  100% {
-    transform: scale(1);
   }
 }
 
@@ -228,7 +204,7 @@ body {
   background-color: var(--boxBg);
   padding: 32px 16px;
   border-radius: var(--borderRSize-Big);
-width: 100%;
+  width: 100%;
 }
 
 .otherMetrics>div>.labelCont {
@@ -959,13 +935,17 @@ width: 100%;
   font-size: 16px;
   margin-top: 12px;
   font-weight: 600;
-  box-shadow: 0px 6px 0px #bbd9ff;
   transition-duration: 0.5s;
+}
+
+.proceed:disabled{
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .proceed:hover,
 .back:hover {
-  box-shadow: none;
+  background-color: var(--secondaryColor);
   cursor: pointer;
   transition: 0.3s;
 }
@@ -1225,8 +1205,17 @@ width: 100%;
   gap: 4px;
 }
 
-.profileButton,
-.logoutButton {
+.profileButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  border: 0;
+  background-color: #5ba2fe1f;
+  cursor: pointer;
+  color: #5BA2FE;
+}
+
+.navbarActions button{
   width: 60px;
   height: 60px;
   border-radius: 12px;
@@ -1255,6 +1244,11 @@ width: 100%;
 .success-popup span {
   font-weight: 500;
   color: #333;
+}
+
+.navbarActions{
+  display: flex;
+  gap: 12px;
 }
 
 /* AuthorNavbar End */
@@ -1679,7 +1673,7 @@ select {
   gap: 24px;
   background-color: var(--boxBg);
   margin: 12px 0;
-  border-radius: var(--borderRSize-Big);  
+  border-radius: var(--borderRSize-Big);
   padding: 24px;
   color: var(--secondaryColor);
 }
@@ -2867,14 +2861,14 @@ select {
 }
 
 
-.workoutContainer{
+.workoutContainer {
   margin: 32px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.workoutContainer > .actionButtons button{
+.workoutContainer>.actionButtons button {
   background-color: #5ba2fe;
   color: #ffffff;
   border: 0;
@@ -2891,11 +2885,11 @@ select {
   width: 100%;
 }
 
-.workoutContainer > .actionButtons button:hover{
+.workoutContainer>.actionButtons button:hover {
   background-color: var(--secondaryColor);
 }
 
-.workout-history-page{
+.workout-history-page {
   margin: 32px 16px;
 }
 
@@ -3037,7 +3031,7 @@ select {
   border-radius: 50%;
 }
 
-.metric-card .desc{
+.metric-card .desc {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -3050,7 +3044,7 @@ select {
   padding: var(--paddingBox);
   background-color: var(--whiteColor50);
   border-radius: var(--borderRSize-Big);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   overflow-x: scroll;
   display: flex;
   flex-direction: column;
@@ -3074,11 +3068,13 @@ select {
   overflow-x: auto;
   gap: 0.75rem;
   padding-bottom: 0.5rem;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .date-scroll::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none;
+  /* Chrome, Safari */
 }
 
 .date-box {
@@ -3087,7 +3083,7 @@ select {
   text-align: center;
   border-radius: 8px;
   background-color: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .date-box .day {
@@ -3167,6 +3163,7 @@ select {
 
 .date-box {
   scroll-snap-align: center;
+
 }
 
 
@@ -3194,4 +3191,11 @@ select {
 
 .food-suggestions li:hover {
   background-color: #f0f0f0;
+}
+
+.healthTools{
+  margin: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
