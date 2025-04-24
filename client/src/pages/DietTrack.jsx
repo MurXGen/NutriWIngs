@@ -125,7 +125,7 @@ const DietTrack = () => {
 
   const fetchDietStats = async (date, userId) => {
     try {
-      const response = await axios.get(`https://nutriwings.vercel.app/api/diet/diet-stats?date=${date}&userId=${userId}`);
+      const response = await axios.get(`https://nutriwings.onrender.app/api/diet/diet-stats?date=${date}&userId=${userId}`);
       if (response.data.success) {
         const stats = response.data.stats || {
           totalCalories: 0,
@@ -148,7 +148,7 @@ const DietTrack = () => {
 
   const fetchRecomCal = async (userId) => {
     try {
-      const response = await axios.get(`https://nutriwings.vercel.app/api/diet/recomcal?userId=${userId}`);
+      const response = await axios.get(`https://nutriwings.onrender.app/api/diet/recomcal?userId=${userId}`);
       if (response.data.success) {
         setRecomCal(response.data.recomCal);
       } else {
@@ -163,7 +163,7 @@ const DietTrack = () => {
   const fetchCalorieDataForMonth = async (year, monthIndex, userId) => {
     try {
       const response = await axios.get(
-        `https://nutriwings.vercel.app/api/diet/calorie-data?year=${year}&month=${monthIndex + 1}&userId=${userId}`
+        `https://nutriwings.onrender.app/api/diet/calorie-data?year=${year}&month=${monthIndex + 1}&userId=${userId}`
       );
       if (response.data.success) {
         setCalorieData(response.data.calorieData || {});
